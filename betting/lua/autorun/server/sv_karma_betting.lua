@@ -3,40 +3,6 @@
 -- Version: 1.0
 
 if SERVER then
-
-	function karmabet_CheckForWin()
-		if GAMEMODE.MapWin == WIN_TRAITOR or GAMEMODE.MapWin == WIN_INNOCENT then
-			local mw = GAMEMODE.MapWin
-			GAMEMODE.MapWin = WIN_NONE
-			return mw
-		end
-	
-		local traitor_alive = false
-		local innocent_alive = false
-		for k,v in pairs(player.GetAll()) do
-			if v:Alive() and v:IsTerror() then
-				if v:GetTraitor() then
-					traitor_alive = true
-				else
-				innocent_alive = true
-				end
-			end
-
-			if traitor_alive and innocent_alive then
-				return WIN_NONE
-			end
-		end
-
-		if traitor_alive and not innocent_alive then
-			return WIN_TRAITOR
-		elseif not traitor_alive and innocent_alive then
-			return WIN_INNOCENT
-		elseif not innocent_alive then
-			return WIN_TRAITOR
-		end
-
-		return WIN_NONE
-	end
 	
 	KARMABET_CAN_BET = true
 	
