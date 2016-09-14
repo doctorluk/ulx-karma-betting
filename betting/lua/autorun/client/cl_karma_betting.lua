@@ -18,14 +18,8 @@ end)
 -- Start betting
 net.Receive( "karmabet_updatehud", function( net_response )
 
-	local amount = net.ReadInt( 32 )
-	local target = net.ReadString( )
+	t_betcount = net.ReadInt( 32 )
+	i_betcount = net.ReadInt( 32 )
 	
-	if target == "traitor" then
-		t_betcount = amount;
-	elseif target == "innocent" then
-		i_betcount = amount;
-	end
-	
-	print("[KARMA DEBUG] Received Server's betting call with " .. amount .. " karma amount for " .. target)
+	print("[KARMA DEBUG] Received Server's betting call with T-Count: " .. t_betcount .. " and I-Count: " .. i_betcount)
 end)

@@ -40,10 +40,10 @@ if SERVER then
 	
 	KARMABET_CAN_BET = true
 	
-	t_bet_total = 0
-	i_bet_total = 0
-	tbl_betters = {}
-	tbl_results = {}
+	karmabet_bet_total_t = 0
+	karmabet_bet_total_i = 0
+	karmabet_tbl_betters = {}
+	karmabet_tbl_results = {}
 	karmabet_winner = ""
 	
 	-- Used to communicate with clients
@@ -152,7 +152,7 @@ if SERVER then
 		end
 		
 		-- Check if player changed his mind about voting or limit is reached
-		local tmptable = tbl_betters[calling_ply:SteamID()]
+		local tmptable = karmabet_tbl_betters[calling_ply:SteamID()]
 		if tmptable then
 			local saved_amount = tmptable[1]
 			local saved_target = tmptable[2]
@@ -177,7 +177,7 @@ if SERVER then
 			
 			-- Update player's saved amount
 			local new_saved_amount = amount + saved_amount
-			tbl_betters[calling_ply:SteamID()] = { new_saved_amount, target }
+			karmabet_tbl_betters[calling_ply:SteamID()] = { new_saved_amount, target }
 		end
 		
 		-- If all passes, start bet
@@ -196,18 +196,18 @@ if SERVER then
 		
 		-- Add to global counter
 		if target == "traitor" then
-			t_bet_total = t_bet_total + amount
-			amountSending = t_bet_total
+			karmabet_bet_total_t = karmabet_bet_total_t + amount
+			amountSending = karmabet_bet_total_t
 		else
-			i_bet_total = i_bet_total + amount
-			amountSending = i_bet_total
+			karmabet_bet_total_i = karmabet_bet_total_i + amount
+			amountSending = karmabet_bet_total_i
 		end
 		
 		-- Add player to table of players who have placed a bet
-		if not tbl_betters[calling_ply:SteamID()] then
-			tbl_betters[calling_ply:SteamID()] = { amount, target }
+		if not karmabet_tbl_betters[calling_ply:SteamID()] then
+			karmabet_tbl_betters[calling_ply:SteamID()] = { amount, target }
 		end
-		PrintTable( tbl_betters )
+		PrintTable( karmabet_tbl_betters )
 		
 		karmabet_echoBetPlacement( calling_ply, amount, target )
 		karmabet_updateAllPlayers()
@@ -220,7 +220,7 @@ if SERVER then
 		local bet_i = 0
 		local bet_t = 0
 		
-		for _, entry in pairs( tbl_betters ) do
+		for _, entry in pairs( karmabet_tbl_betters ) do
 		
 			if entry[2] == "traitor" then
 				bet_t = entry[1] + bet_t
@@ -230,8 +230,8 @@ if SERVER then
 			
 		end
 		
-		t_bet_total = bet_t
-		i_bet_total = bet_i
+		karmabet_bet_total_t = bet_t
+		karmabet_bet_total_i = bet_i
 		
 		karmabet_updateAllPlayers()
 		
@@ -239,22 +239,11 @@ if SERVER then
 	
 	-- Update the display for all players
 	function karmabet_updateAllPlayers()
-	
-		local allplayers = player.GetHumans()
 		
-		for _, player in ipairs( allplayers ) do
-		
-			net.Start( "karmabet_updatehud" )
-			net.WriteInt( t_bet_total, 32 )
-			net.WriteString( "traitor" )
-			net.Send( player )
-			
-			net.Start( "karmabet_updatehud" )
-			net.WriteInt( i_bet_total, 32 )
-			net.WriteString( "innocent" )
-			net.Send( player )
-			
-		end
+		net.Start( "karmabet_updatehud" )
+		net.WriteInt( karmabet_bet_total_t, 32 )
+		net.WriteInt( karmabet_bet_total_i, 32 )
+		net.Broadcast()
 		
 	end
 	
@@ -262,7 +251,7 @@ if SERVER then
 	
 		KARMABET_CAN_BET = true
 		KARMABET_HAS_RUN = false
-		table.Empty( tbl_results )
+		table.Empty( karmabet_tbl_results )
 		karmabet_winner = ""
 		
 		ServerLog("[Karmabet] Bets open!\n")
@@ -293,121 +282,94 @@ if SERVER then
 	hook.Add( "TTTBeginRound", "karmabet_timedBettingEnd", karmabet_timedBettingEnd )
 	
 	-- Act after a round has ended
-	function karmabet_onPotentialEnd( callback_data )
+	function karmabet_onRoundEnd( winning_team )
 	
-		-- timer.Simple( 0.005, function()	
+		if not KARMABET_HAS_RUN then
 		
-			if GetRoundState() == ROUND_ACTIVE or isnumber( callback_data ) and not KARMABET_HAS_RUN then
+			KARMABET_HAS_RUN = true
 			
-				if karmabet_CheckForWin() == WIN_NONE then return end
+			timer.Remove( "karmabet_timer_timewarning" )
+			timer.Remove( "karmabet_timer" )
 			
-				KARMABET_HAS_RUN = true
-				
-				timer.Remove( "karmabet_timer_timewarning" )
-				timer.Remove( "karmabet_timer" )
-				
-				if isnumber(callback_data) then
-					ServerLog("TIMER KILLED + ROUND END!!\n")
-				else
-					ServerLog("TIMER KILLED + DEATH EVENT!!\n")
-				end
-				
-				local winner = "innocent"
-				local loser_amount = t_bet_total
-				
-				if karmabet_CheckForWin() == WIN_TRAITOR then
-					winner = "traitor"
-					loser_amount = i_bet_total
-				end
-				
-				karmabet_winner = winner
-				
-				ServerLog("KARMABET WINNER: " .. winner .. "\n")
-				
-				-- PrintTable( tbl_betters )
-				
-				-- Winners get their bet, and a bonus depending on the amount of bets against them				
-				for id, entry in pairs( tbl_betters ) do
-				
-					local ply = player.GetBySteamID( id )
-					if ply then
-						local amount = entry[1]
-						local target = entry[2]
+			local loser_amount = karmabet_bet_total_t
+			karmabet_winner = "innocent"
+			
+			if winning_team == WIN_TRAITOR then
+				karmabet_winner = "traitor"
+				loser_amount = karmabet_bet_total_i
+			end
+			
+			local own_bet_winscale = (math.random(10, 25) / 100) -- between 10% and 25% of entered bet
+			local losers_bet_winscale = (math.random(5, 15) / 100) -- between 5% and 15% of bets from the losing team
+			
+			-- Winners get their bet, and a bonus depending on the amount of bets against them				
+			for id, entry in pairs( karmabet_tbl_betters ) do
+			
+				local ply = player.GetBySteamID( id )
+				if ply then
+					local amount = entry[1]
+					local target = entry[2]
+					
+					if target == karmabet_winner then
+					
+						local karmaReturned = math.ceil( amount + ( amount * own_bet_winscale ) + ( loser_amount * losers_bet_winscale ) )
 						
-						if target == winner then
+						karmabet_tbl_results[id] = { karmaReturned, target }
 						
-							local karmaReturned = math.ceil( amount + ( amount * (math.random(10, 25) / 100) ) + ( loser_amount * (math.random(5, 15) / 100) ) )
-							
-							tbl_results[id] = { karmaReturned, target }
-							
-							ULib.tsayColor( nil, false,
-								Color( 50, 50, 50, 255 ), "[", 
-								Color( 190, 40, 40, 255), "Karmabet",
-								Color( 50, 50, 50, 255), "] ",
-								Color( 255, 255, 0, 0 ), ply:Nick(),
-								Color( 0, 255, 0, 255), " gewinnt ",
-								Color( 255, 255, 255, 255), karmaReturned .. "",
-								Color( 0, 255, 0, 255), " Karma!" )
-							
-							local newKarma = ply:GetLiveKarma() + karmaReturned
-							if newKarma > 1000 then
-								newKarma = 1000
-							end
-							ply:SetBaseKarma( newKarma )
-							ply:SetLiveKarma( newKarma )
-							
-						else
-						
-							ULib.tsayColor( nil, false,
+						ULib.tsayColor( nil, false,
 							Color( 50, 50, 50, 255 ), "[", 
 							Color( 190, 40, 40, 255), "Karmabet",
 							Color( 50, 50, 50, 255), "] ",
 							Color( 255, 255, 0, 0 ), ply:Nick(),
-							Color( 255, 0, 0, 255), " verliert ",
-							Color( 255, 255, 255, 255), amount .. "",
-							Color( 255, 0, 0, 255), " Karma!" )
-							
-							tbl_results[id] = { amount, target }
+							Color( 0, 255, 0, 255), " gewinnt ",
+							Color( 255, 255, 255, 255), karmaReturned .. "",
+							Color( 0, 255, 0, 255), " Karma!" )
+						
+						local newKarma = ply:GetLiveKarma() + karmaReturned
+						if newKarma > 1000 then
+							newKarma = 1000
 						end
+						ply:SetBaseKarma( newKarma )
+						ply:SetLiveKarma( newKarma )
+						
+					else
+					
+						ULib.tsayColor( nil, false,
+						Color( 50, 50, 50, 255 ), "[", 
+						Color( 190, 40, 40, 255), "Karmabet",
+						Color( 50, 50, 50, 255), "] ",
+						Color( 255, 255, 0, 0 ), ply:Nick(),
+						Color( 255, 0, 0, 255), " verliert ",
+						Color( 255, 255, 255, 255), amount .. "",
+						Color( 255, 0, 0, 255), " Karma!" )
+						
+						karmabet_tbl_results[id] = { amount, target }
 					end
 				end
-				
-				-- PrintTable( tbl_results )
-				karmabet_insertResultsMySQL()
-				
-				table.Empty(tbl_betters)
-				karmabet_refresh()
-
-				-- Since we run our Hook AFTER karma has been saved, we have to save it again, otherwise the gained karma
-				-- is lost upon mapchange
-				KARMA.Rebase()
-				KARMA.RememberAll()
 			end
-		-- end)
+			
+			-- PrintTable( karmabet_tbl_results )
+			karmabet_insertResultsMySQL()
+			
+			table.Empty(karmabet_tbl_betters)
+			karmabet_refresh()
+
+			-- Since we run our Hook AFTER karma has been saved, we have to save it again, otherwise the gained karma
+			-- is lost upon mapchange
+			KARMA.Rebase()
+			KARMA.RememberAll()
+		end
 	end
-	-- hook.Add( "PlayerDeath", "karmabet_onPotentialEnd", karmabet_onPotentialEnd )
-	hook.Add( "TTTEndRound", "karmabet_onPotentialEnd", karmabet_onPotentialEnd )
+	hook.Add( "TTTEndRound", "karmabet_onRoundEnd", karmabet_onRoundEnd )
 	
 	-- Send new player current bets
 	function karmabet_onPlayerConnect( ply )
 		net.Start( "karmabet_updatehud" )
-		net.WriteInt( t_bet_total, 32 )
-		net.WriteString( "traitor" )
-		net.Send( ply )
-		
-		net.Start( "karmabet_updatehud" )
-		net.WriteInt( i_bet_total, 32 )
-		net.WriteString( "innocent" )
+		net.WriteInt( karmabet_bet_total_t, 32 )
+		net.WriteInt( karmabet_bet_total_i, 32 )
 		net.Send( ply )
 	end
 	hook.Add( "PlayerInitialSpawn", "karmabet_onPlayerConnect", karmabet_onPlayerConnect )
-	
-	-- Remove disconnected player from bets and update
-	-- function karmabet_onPlayerDisconnect( ply )
-		-- tbl_betters[ply:SteamID()] = nil
-		-- karmabet_refresh()
-	-- end
-	-- hook.Add( "PlayerDisconnected", "karmabet_onPlayerDisconnect", karmabet_onPlayerDisconnect )
 	
 	-- Disable !bet chat text
 	hook.Add( "PlayerSay", "KarmabetChatPrevention", function( ply, text, team )

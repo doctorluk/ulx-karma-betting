@@ -199,9 +199,9 @@ if SERVER then
 			local loops = 0
 			local querystr = "INSERT INTO `" .. DATABASE_NAME .. "`.`karmabet` (`bet_id`, `name`, `steamid`, `amount`) VALUES("
 			
-			PrintTable( tbl_results )
+			PrintTable( karmabet_tbl_results )
 			-- Go through the table of karmabet participants and construct the SQL-String
-			for id, entry in pairs( tbl_results ) do
+			for id, entry in pairs( karmabet_tbl_results ) do
 			
 				local ply = player.GetBySteamID( id )
 				if ply then 
@@ -229,13 +229,13 @@ if SERVER then
 					loops = loops + 1
 				end
 			end
-			querystr = querystr .. ";"
-			ServerLog("[Karmabet] Query String: " .. querystr .. "\n")
 			
 			if loops == 0 then return end
 			
+			querystr = querystr .. ";"
 			query( querystr )
 			
+			ServerLog("[Karmabet] Query String: " .. querystr .. "\n")
 		end )
 	end 
 
