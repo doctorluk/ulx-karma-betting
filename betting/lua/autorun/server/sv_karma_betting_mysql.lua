@@ -62,7 +62,7 @@ if SERVER then
 	
 	-- Shows the five highest entries in the database
 	function karmabet_showMyBetSummary( ply, steamid )
-		query( "SELECT sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL 7 DAY) AND steamid = '" .. db:escape(steamid) .. "' LIMIT 1", function( list )
+		query( "SELECT sum(amount) as total FROM `karmabet` WHERE steamid = '" .. db:escape(steamid) .. "' LIMIT 1", function( list )
 			
 			PrintTable(list)
 					

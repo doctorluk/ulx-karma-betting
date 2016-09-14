@@ -118,6 +118,12 @@ if SERVER then
 			return false
 		end
 		
+		-- Prevent betting when slowmo (of end-round) is running
+		if game.GetTimeScale() ~= 1 then
+			karmabet_reportError( calling_ply, "Kann nicht während der Zeitlupe wetten! (Du Cheater!)" )
+			return false
+		end
+		
 		-- Check for valid team
 		target = string.lower( target )
 		if target == "t" or target == "traitor" then
@@ -289,7 +295,7 @@ if SERVER then
 	-- Act after a round has ended
 	function karmabet_onPotentialEnd( callback_data )
 	
-		timer.Simple( 0.005, function()	
+		-- timer.Simple( 0.005, function()	
 		
 			if GetRoundState() == ROUND_ACTIVE or isnumber( callback_data ) and not KARMABET_HAS_RUN then
 			
@@ -309,12 +315,14 @@ if SERVER then
 				local winner = "innocent"
 				local loser_amount = t_bet_total
 				
-				if result == WIN_TRAITOR then
+				if karmabet_CheckForWin() == WIN_TRAITOR then
 					winner = "traitor"
 					loser_amount = i_bet_total
 				end
 				
 				karmabet_winner = winner
+				
+				ServerLog("KARMABET WINNER: " .. winner .. "\n")
 				
 				-- PrintTable( tbl_betters )
 				
@@ -375,10 +383,10 @@ if SERVER then
 				KARMA.Rebase()
 				KARMA.RememberAll()
 			end
-		end)
+		-- end)
 	end
-	hook.Add( "PlayerDeath", "karmabet_onPotentialEnd", karmabet_onPotentialEnd )
-	hook.Add( "TTTRoundEnd", "karmabet_onPotentialEnd", karmabet_onPotentialEnd )
+	-- hook.Add( "PlayerDeath", "karmabet_onPotentialEnd", karmabet_onPotentialEnd )
+	hook.Add( "TTTEndRound", "karmabet_onPotentialEnd", karmabet_onPotentialEnd )
 	
 	-- Send new player current bets
 	function karmabet_onPlayerConnect( ply )
