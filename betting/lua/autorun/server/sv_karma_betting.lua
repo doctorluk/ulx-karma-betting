@@ -292,8 +292,8 @@ if SERVER then
 							Color( 0, 255, 0, 255), " Karma!" )
 						
 						local newKarma = ply:GetLiveKarma() + karmaReturned
-						if newKarma > 1000 then
-							newKarma = 1000
+						if newKarma > GetConVar("ttt_karma_max"):GetInt() then
+							newKarma = GetConVar("ttt_karma_max"):GetInt()
 						end
 						ply:SetBaseKarma( newKarma )
 						ply:SetLiveKarma( newKarma )
