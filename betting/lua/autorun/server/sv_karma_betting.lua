@@ -203,14 +203,23 @@ if SERVER then
 		
 	end
 	
-	-- Update the display for all players
+	-- Update the display for all players/dead players
 	function karmabet_updateAllPlayers()
-		
-		net.Start( "karmabet_updatehud" )
-		net.WriteInt( karmabet_bet_total_t, 32 )
-		net.WriteInt( karmabet_bet_total_i, 32 )
-		net.Broadcast()
-		
+		if (KARMABET_SHOUTOUT_ALIVE) then
+			net.Start( "karmabet_updatehud" )
+			net.WriteInt( karmabet_bet_total_t, 32 )
+			net.WriteInt( karmabet_bet_total_i, 32 )
+			net.Broadcast()
+		else
+			for k, v in ipairs( player.GetHumans() ) do
+				if not (v:IsActive()) then
+					net.Start( "karmabet_updatehud" )
+					net.WriteInt( karmabet_bet_total_t, 32 )
+					net.WriteInt( karmabet_bet_total_i, 32 )
+					net.Send(v) -- sending for each player, because RecipientFilter is not working
+				end
+			end
+		end
 	end
 	
 	function karmabet_timedBettingEnd()
@@ -223,23 +232,43 @@ if SERVER then
 		ServerLog("[Karmabet] Bets open!\n")
 		
 		timer.Create( "karmabet_timer_timewarning", KARMABET_BET_TIME - 20, 1, function()
-		
-			ULib.tsayColor( nil, false,
-				Color( 50, 50, 50, 255 ), "[", 
-				Color( 190, 40, 40, 255 ), "Karmabet",
-				Color( 50, 50, 50, 255 ), "] ", 
-				Color( 255, 255, 0, 0 ), "Noch 20 Sekunden um zu wetten!" )
-			
+			if (KARMABET_SHOUTOUT_ALIVE) then
+				ULib.tsayColor( nil, false,
+					Color( 50, 50, 50, 255 ), "[", 
+					Color( 190, 40, 40, 255 ), "Karmabet",
+					Color( 50, 50, 50, 255 ), "] ", 
+					Color( 255, 255, 0, 0 ), "Noch 20 Sekunden um zu wetten!" )
+			else
+				for k, v in ipairs( player.GetHumans() ) do
+					if not (v:IsActive()) then
+						ULib.tsayColor( v, false,
+							Color( 50, 50, 50, 255 ), "[", 
+							Color( 190, 40, 40, 255 ), "Karmabet",
+							Color( 50, 50, 50, 255 ), "] ", 
+							Color( 255, 255, 0, 0 ), "Noch 20 Sekunden um zu wetten!" )
+					end
+				end
+			end
 		end )
 		
 		timer.Create( "karmabet_timer", KARMABET_BET_TIME, 1, function()
-		
-			ULib.tsayColor( nil, false,
-				Color( 50, 50, 50, 255 ), "[", 
-				Color( 190, 40, 40, 255 ), "Karmabet",
-				Color( 50, 50, 50, 255 ), "] ", 
-				Color( 255, 255, 0, 0 ), "Wetten geschlossen!" )
-			
+			if (KARMABET_SHOUTOUT_ALIVE) then
+				ULib.tsayColor( nil, false,
+					Color( 50, 50, 50, 255 ), "[", 
+					Color( 190, 40, 40, 255 ), "Karmabet",
+					Color( 50, 50, 50, 255 ), "] ", 
+					Color( 255, 255, 0, 0 ), "Wetten geschlossen!" )
+			else
+				for k, v in ipairs( player.GetHumans() ) do
+					if not (v:IsActive()) then
+						ULib.tsayColor( v, false,
+							Color( 50, 50, 50, 255 ), "[", 
+							Color( 190, 40, 40, 255 ), "Karmabet",
+							Color( 50, 50, 50, 255 ), "] ", 
+							Color( 255, 255, 0, 0 ), "Wetten geschlossen!" )
+					end
+				end
+			end
 			KARMABET_CAN_BET = false
 			ServerLog("[Karmabet] Bets closed!\n")
 			
