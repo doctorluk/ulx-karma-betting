@@ -400,40 +400,6 @@ if SERVER then
 	end
 	hook.Add( "TTTEndRound", "karmabet_onRoundEnd", karmabet_onRoundEnd )
 	
-	--[[
-	function karmabet_onBodyFound(ply, deadply, corpse)
-	
-		if KARMABET_DELAY_BET_ANNOUCEMENT and deadply and karmabet_corpses_found < KARMABET_MINIMUM_IDENTIFIED_BODIES then
-		
-			local refresh = false
-			
-			karmabet_corpses_found = karmabet_corpses_found + 1
-			
-			for id, entry in pairs( karmabet_tbl_betters_hidden ) do
-				if id == deadply:SteamID() then
-					karmabet_reportNotice( nil, deadply:Nick() .. "'s Wette wurde nachgetragen!" )
-					karmabet_tbl_betters[id] = { entry[1], entry[2] }
-					karmabet_tbl_betters_hidden[id] = nil
-					if not refresh then refresh = true end
-				end
-			end
-			
-			if refresh then karmabet_refresh() end
-			
-		elseif karmabet_corpses_found >= KARMABET_MINIMUM_IDENTIFIED_BODIES and #karmabet_tbl_betters_hidden > 0 then
-			for id, entry in pairs( karmabet_tbl_betters_hidden ) do
-					karmabet_reportNotice( nil, "Genug Leute tot, jetzt führen wir alle Wetten auf!" )
-					karmabet_tbl_betters[id] = { entry[1], entry[2] }
-					karmabet_tbl_betters_hidden[id] = nil
-			end
-			karmabet_refresh()
-		end
-		
-		karmabet_reportNotice( nil, ply:Nick() .. " found body of " .. deadply:Nick() )
-	end
-	hook.Add( "TTTBodyFound", "karmabet_onBodyFound", karmabet_onBodyFound )
-	]]--
-	
 	-- Send new player current bets
 	function karmabet_onPlayerConnect( ply )
 		net.Start( "karmabet_updatehud" )
