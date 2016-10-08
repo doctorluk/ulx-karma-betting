@@ -10,7 +10,7 @@ if SERVER then
 	
 	local query_success = nil
 	
-	query_error = sql.Query( "CREATE TABLE IF NOT EXISTS karmabet (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, bet_id INTEGER NOT NULL, name TEXT, steamid TEXT, amount INTEGER, date DATETIME DEFAULT CURRENT_TIMESTAMP)" )
+	query_success = sql.Query( "CREATE TABLE IF NOT EXISTS karmabet (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, bet_id INTEGER NOT NULL, name TEXT, steamid TEXT, amount INTEGER, date DATETIME DEFAULT CURRENT_TIMESTAMP)" )
 	
 	if query_success == false then
 		print( "[Karmabet] Error creating SQLite table!" )
