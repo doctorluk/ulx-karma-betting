@@ -72,7 +72,7 @@ if SERVER then
 						Color( 50, 50, 50, 255 ), "[", 
 						Color( 190, 40, 40, 255 ), "Karmabet",
 						Color( 50, 50, 50, 255 ), "] ",
-						Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!")
+						Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!" )
 					return
 				end
 				
@@ -108,7 +108,7 @@ if SERVER then
 					Color( 50, 50, 50, 255 ), "[", 
 					Color( 190, 40, 40, 255 ), "Karmabet",
 					Color( 50, 50, 50, 255 ), "] ",
-					Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!")
+					Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!" )
 				return
 			end
 			
@@ -145,7 +145,7 @@ if SERVER then
 					Color( 50, 50, 50, 255 ), "[", 
 					Color( 190, 40, 40, 255 ), "Karmabet",
 					Color( 50, 50, 50, 255 ), "] ",
-					Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!")
+					Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!" )
 				return
 			end
 			

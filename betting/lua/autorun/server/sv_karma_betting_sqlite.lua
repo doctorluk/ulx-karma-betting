@@ -29,7 +29,7 @@ if SERVER then
 					Color( 50, 50, 50, 255 ), "[", 
 					Color( 190, 40, 40, 255 ), "Karmabet",
 					Color( 50, 50, 50, 255 ), "] ",
-					Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!")
+					Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!" )
 				return
 			end
 			
@@ -55,7 +55,7 @@ if SERVER then
 	
 	-- Shows the five highest entries in the database
 	function karmabet_showBestBetters( duration )
-		local list = sql.Query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY steamid HAVING sum(amount) > 0 ORDER BY total DESC LIMIT 5" )
+		local list = sql.Query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date > (SELECT DATETIME('now', '-7 day')) GROUP BY steamid HAVING sum(amount) > 0 ORDER BY total DESC LIMIT 5" )
 		
 		print( "[Karmabet] showBestBetters table results:" ) 
 		PrintTable(list)
@@ -65,7 +65,7 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
 				Color( 50, 50, 50, 255 ), "] ",
-				Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!")
+				Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!" )
 			return
 		end
 		
@@ -92,7 +92,7 @@ if SERVER then
 	end
 	
 	function karmabet_showWorstBetters( duration )
-		local list = sql.Query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY steamid HAVING sum(amount) < 0 ORDER BY total ASC LIMIT 5" )
+		local list = sql.Query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date > (SELECT DATETIME('now', '-7 day')) GROUP BY steamid HAVING sum(amount) < 0 ORDER BY total DESC LIMIT 5" )
 			
 		print( "[Karmabet] showWorstBetters table results:" ) 
 		PrintTable(list)
@@ -102,7 +102,7 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
 				Color( 50, 50, 50, 255 ), "] ",
-				Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!")
+				Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!" )
 			return
 		end
 		
@@ -140,7 +140,7 @@ if SERVER then
 		...
 		]]--
 		
-		local data = sql.Query( "SELECT MAX(bet_id) + 1 as last_betid FROM karmabet WHERE 1 LIMIT 1")
+		local data = sql.Query( "SELECT MAX(bet_id) + 1 as last_betid FROM karmabet WHERE 1 LIMIT 1" )
 	
 		print("[Karmabet] last_betid table result:") 
 		PrintTable(data) 
@@ -193,7 +193,7 @@ if SERVER then
 		querystr = querystr .. ";"
 		sql.Query( querystr )
 		
-		ServerLog("[Karmabet] Query String: " .. querystr .. "\n")
+		ServerLog( "[Karmabet] Query String: " .. querystr .. "\n" )
 	end 
 
 end
