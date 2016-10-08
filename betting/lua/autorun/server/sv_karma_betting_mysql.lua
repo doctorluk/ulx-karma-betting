@@ -172,7 +172,7 @@ if SERVER then
 		end)
 	end
 	
-	function karmabet_insertResultsMySQL()
+	function karmabet_insertIntoDatabase()
 		--[[
 		Database Structure:
 		1: id

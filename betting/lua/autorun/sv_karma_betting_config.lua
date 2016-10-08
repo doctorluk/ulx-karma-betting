@@ -2,7 +2,7 @@
 -- http://steamcommunity.com/id/doctorluk/
 -- Version: 1.0
 
-KARMABET_USE_MYSQL = true -- Please refer to server/sv_karma_betting_mysql.lua for database configuration
+KARMABET_USE_MYSQL = false -- Please refer to server/sv_karma_betting_mysql.lua for database configuration if set to true
 
 KARMABET_MINIMUM_IDENTIFIED_BODIES = 2
 
