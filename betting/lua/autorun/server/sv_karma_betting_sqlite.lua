@@ -153,11 +153,10 @@ if SERVER then
 			bet_id = data[1].last_betid
 		end
 		
-		local loops = 0
-		local querystr = "INSERT INTO karmabet (bet_id, name, steamid, amount) VALUES("
-		
 		print( "[Karmabet] All betters table:" ) 
 		PrintTable( karmabet_tbl_results )
+		
+		sql.Begin()
 		-- Go through the table of karmabet participants and construct the SQL-String
 		for id, entry in pairs( karmabet_tbl_results ) do
 		
@@ -166,34 +165,16 @@ if SERVER then
 				local amount = entry[1]
 				local target = entry[2]
 				
-				if loops > 0 then
-					querystr = querystr .. ", ("
-				end
-					
 				if target == karmabet_winner then
-					querystr = querystr
-					.. bet_id .. ", '" 
-					.. db:escape( ply:Nick() ) .. "', '" 
-					.. db:escape( id ) .. "', " 
-					.. amount .. ")"
+					sql.Query( "INSERT INTO karmabet (bet_id, name, steamid, amount) VALUES(" .. bet_id .. ", " .. sql.SQLStr( ply:Nick() ) .. ", " .. sql.SQLStr( id ) .. ", " .. amount .. ")" )
 				else
-					querystr = querystr
-					.. bet_id .. ", '" 
-					.. db:escape( ply:Nick() ) .. "', '" 
-					.. db:escape( id ) .. "', " 
-					.. (-1 * amount) .. ")"
+					sql.Query( "INSERT INTO karmabet (bet_id, name, steamid, amount) VALUES(" .. bet_id .. ", " .. sql.SQLStr( ply:Nick() ) .. ", " .. sql.SQLStr( id ) .. ", " .. ( -1 * amount ) .. ")" )
 				end
-				
-				loops = loops + 1
 			end
 		end
 		
-		if loops == 0 then return end
+		sql.Commit()
 		
-		querystr = querystr .. ";"
-		sql.Query( querystr )
-		
-		ServerLog( "[Karmabet] Query String: " .. querystr .. "\n" )
 	end 
 
 end
