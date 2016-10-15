@@ -387,7 +387,7 @@ if SERVER then
 			end
 			
 			-- PrintTable( karmabet_tbl_results )
-			karmabet_insertResultsMySQL()
+			karmabet_insertIntoDatabase()
 			
 			table.Empty(karmabet_tbl_betters)
 			karmabet_refresh()
