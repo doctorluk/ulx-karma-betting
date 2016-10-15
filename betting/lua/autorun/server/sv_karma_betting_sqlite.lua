@@ -1,6 +1,6 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.0
+-- Version: 1.1
 if SERVER then
 	
 	if KARMABET_USE_MYSQL then return end

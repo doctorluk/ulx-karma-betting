@@ -1,6 +1,6 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.0
+-- Version: 1.1
 if SERVER then
 	
 	if not KARMABET_USE_MYSQL then return end
@@ -10,7 +10,7 @@ if SERVER then
 	--
 	--	DATABASE CONFIGURATION
 	--
-	local DATABASE_HOST = "" -- The address to your database server (use "localhost" if MySQL server = GMod Server)
+	local DATABASE_HOST = "" -- The address to your database server (use "localhost" if MySQL server = GMod server)
 	local DATABASE_NAME = "" -- The name of the database to put our tables into
 	local DATABASE_USERNAME = "" -- The name of the user that has rights to use and modify said database
 	local DATABASE_PASSWORD = "" -- The user's password
