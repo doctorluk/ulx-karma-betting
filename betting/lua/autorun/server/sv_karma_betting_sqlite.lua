@@ -58,9 +58,13 @@ if SERVER then
 		local list = sql.Query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date > (SELECT DATETIME('now', '-7 day')) GROUP BY steamid HAVING sum(amount) > 0 ORDER BY total DESC LIMIT 5" )
 		
 		print( "[Karmabet] showBestBetters table results:" ) 
-		PrintTable(list)
+		if list then
+			PrintTable(list)
+		else
+			print( "Empty list!" )
+		end
 	
-		if #list == 0 then
+		if not list or #list == 0 then
 			ULib.tsayColor( nil, true,
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
@@ -95,9 +99,13 @@ if SERVER then
 		local list = sql.Query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date > (SELECT DATETIME('now', '-7 day')) GROUP BY steamid HAVING sum(amount) < 0 ORDER BY total DESC LIMIT 5" )
 			
 		print( "[Karmabet] showWorstBetters table results:" ) 
-		PrintTable(list)
+		if list then
+			PrintTable(list)
+		else
+			print( "Empty list!" )
+		end
 	
-		if #list == 0 then
+		if not list or #list == 0 then
 			ULib.tsayColor( nil, true,
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
