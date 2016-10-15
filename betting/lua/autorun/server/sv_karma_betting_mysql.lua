@@ -10,12 +10,15 @@ if SERVER then
 	--
 	--	DATABASE CONFIGURATION
 	--
-	local DATABASE_HOST = ""
-	local DATABASE_USERNAME = ""
-	local DATABASE_PASSWORD = ""
-	local DATABASE_PORT = 3306
-	local DATABASE_NAME = ""
+	local DATABASE_HOST = "" -- The address to your database server (use "localhost" if MySQL server = GMod Server)
+	local DATABASE_NAME = "" -- The name of the database to put our tables into
+	local DATABASE_USERNAME = "" -- The name of the user that has rights to use and modify said database
+	local DATABASE_PASSWORD = "" -- The user's password
+	local DATABASE_PORT = 3306 -- 3306 is MySQL's default port
 
+	--
+	--	DO NOT EDIT ANYTHING BELOW THIS LINE
+	--
 	local queue = {}
 
 	local db = mysqloo.connect( DATABASE_HOST, DATABASE_USERNAME, DATABASE_PASSWORD, DATABASE_NAME, DATABASE_PORT )
