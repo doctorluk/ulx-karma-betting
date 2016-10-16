@@ -67,7 +67,10 @@ if SERVER then
 	function karmabet_showMyBetSummary( ply, steamid )
 		query( "SELECT sum(amount) as total FROM `karmabet` WHERE steamid = '" .. db:escape(steamid) .. "' LIMIT 1", function( list )
 			
-			PrintTable(list)
+			if KARMABET_DEBUG then
+				print( "[Karmabet] showMyBetSummary table results:" ) 
+				PrintTable(list)
+			end
 					
 			for k, v in ipairs( list ) do
 				if #list == 0 or not tonumber(v.total) then
@@ -104,7 +107,10 @@ if SERVER then
 	function karmabet_showBestBetters( duration )
 		query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY steamid HAVING sum(amount) > 0 ORDER BY total DESC LIMIT 5", function( list )
 			
-			PrintTable(list)
+			if KARMABET_DEBUG then
+				print( "[Karmabet] showBestBetters table results:" ) 
+				PrintTable(list)
+			end
 		
 			if #list == 0 then
 				ULib.tsayColor( nil, true,
@@ -141,7 +147,10 @@ if SERVER then
 	function karmabet_showWorstBetters( duration )
 		query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY steamid HAVING sum(amount) < 0 ORDER BY total ASC LIMIT 5", function( list )
 			
-			PrintTable(list)
+			if KARMABET_DEBUG then
+				print( "[Karmabet] showWorstBetters table results:" ) 
+				PrintTable(list)
+			end
 		
 			if #list == 0 then
 				ULib.tsayColor( nil, true,
@@ -238,7 +247,9 @@ if SERVER then
 			querystr = querystr .. ";"
 			query( querystr )
 			
-			ServerLog("[Karmabet] Query String: " .. querystr .. "\n")
+			if KARMABET_DEBUG then
+				ServerLog("[Karmabet] Query String: " .. querystr .. "\n")
+			end
 		end )
 	end 
 

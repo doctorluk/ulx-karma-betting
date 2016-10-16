@@ -7,7 +7,6 @@ if SERVER then
 
 	print( "[Karmabet] Using SQLite." )
 	
-	
 	local query_success = nil
 	
 	query_success = sql.Query( "CREATE TABLE IF NOT EXISTS karmabet (id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, bet_id INTEGER NOT NULL, name TEXT, steamid TEXT, amount INTEGER, date DATETIME DEFAULT CURRENT_TIMESTAMP)" )
@@ -20,8 +19,14 @@ if SERVER then
 	function karmabet_showMyBetSummary( ply, steamid )
 		local list = sql.Query( "SELECT sum(amount) as total FROM `karmabet` WHERE steamid = " .. sql.SQLStr(steamid) .. " LIMIT 1" )
 		
-		print( "[Karmabet] showMyBetSummary table results:" ) 
-		PrintTable(list)
+			if KARMABET_DEBUG then
+				print( "[Karmabet] showMyBetSummary table results:" ) 
+				if list then
+					PrintTable(list)
+				else
+					print( "Empty list!" )
+				end
+			end
 				
 		for k, v in ipairs( list ) do
 			if #list == 0 or not tonumber(v.total) then
@@ -57,11 +62,13 @@ if SERVER then
 	function karmabet_showBestBetters( duration )
 		local list = sql.Query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date > (SELECT DATETIME('now', '-7 day')) GROUP BY steamid HAVING sum(amount) > 0 ORDER BY total DESC LIMIT 5" )
 		
-		print( "[Karmabet] showBestBetters table results:" ) 
-		if list then
-			PrintTable(list)
-		else
-			print( "Empty list!" )
+		if KARMABET_DEBUG then
+			print( "[Karmabet] showBestBetters table results:" ) 
+			if list then
+				PrintTable(list)
+			else
+				print( "Empty list!" )
+			end
 		end
 	
 		if not list or #list == 0 then
@@ -97,12 +104,14 @@ if SERVER then
 	
 	function karmabet_showWorstBetters( duration )
 		local list = sql.Query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date > (SELECT DATETIME('now', '-7 day')) GROUP BY steamid HAVING sum(amount) < 0 ORDER BY total DESC LIMIT 5" )
-			
-		print( "[Karmabet] showWorstBetters table results:" ) 
-		if list then
-			PrintTable(list)
-		else
-			print( "Empty list!" )
+		
+		if KARMABET_DEBUG then
+			print( "[Karmabet] showWorstBetters table results:" ) 
+			if list then
+				PrintTable(list)
+			else
+				print( "Empty list!" )
+			end
 		end
 	
 		if not list or #list == 0 then
@@ -149,9 +158,15 @@ if SERVER then
 		]]--
 		
 		local data = sql.Query( "SELECT MAX(bet_id) + 1 as last_betid FROM karmabet WHERE 1 LIMIT 1" )
-	
-		print("[Karmabet] last_betid table result:") 
-		PrintTable(data) 
+		
+		if KARMABET_DEBUG then
+			print("[Karmabet] last_betid table result:")
+			if data then
+				PrintTable(data)
+			else
+				print( "Empty list!" )
+			end
+		end 
 		
 		-- Set default bet_id to 1 if table is empty
 		local bet_id = 1
@@ -161,8 +176,10 @@ if SERVER then
 			bet_id = data[1].last_betid
 		end
 		
-		print( "[Karmabet] All betters table:" ) 
-		PrintTable( karmabet_tbl_results )
+		if KARMABET_DEBUG then
+			print( "[Karmabet] All betters table:" ) 
+			PrintTable( karmabet_tbl_results )
+		end
 		
 		sql.Begin()
 		-- Go through the table of karmabet participants and construct the SQL-String

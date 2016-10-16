@@ -23,3 +23,6 @@ KARMABET_BET_TIME = 180
 
 -- Minimum karma of a player to have to bet (bets exceeding their karma will be lowered to this minimum here)
 KARMABET_MINIMUM_LIVE_KARMA = 600
+
+-- Print debug messages to console?
+KARMABET_DEBUG = false
