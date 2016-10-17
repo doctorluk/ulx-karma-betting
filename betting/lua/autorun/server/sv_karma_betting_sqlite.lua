@@ -15,9 +15,21 @@ if SERVER then
 		print( "[Karmabet] Error creating SQLite table!" )
 	end
 	
-	-- Shows the five highest entries in the database
-	function karmabet_showMyBetSummary( ply, steamid )
-		local list = sql.Query( "SELECT sum(amount) as total FROM `karmabet` WHERE steamid = " .. sql.SQLStr(steamid) .. " LIMIT 1" )
+	-- Shows the player's sum of all bets he placed
+	function karmabet_showMyBetSummary( ply, steamid, duration )
+	
+		local duration = tonumber( duration ) or "all"
+		if isnumber( duration ) then
+			duration = math.Clamp( duration, 1, 31 ) -- Limit lookbacks between 1 and 31
+		end
+		
+		local querystring = "SELECT sum(amount) as total FROM `karmabet` WHERE steamid = '" .. db:escape(steamid) .. "' LIMIT 1"
+		
+		if ( duration ~= "all" and duration <= 31 and duration > 0 ) then
+			querystring = "SELECT sum(amount) as total FROM `karmabet` WHERE date > (SELECT DATETIME('now', '-" .. duration .. " day')) AND steamid = '" .. db:escape(steamid) .. "' LIMIT 1"
+		end
+		
+		local list = sql.Query( querystring )
 		
 		if KARMABET_DEBUG then
 			print( "[Karmabet] showMyBetSummary table results:" ) 
@@ -27,6 +39,17 @@ if SERVER then
 				print( "Empty list!" )
 			end
 		end
+		
+		-- Format the reported range to be printed to chat
+		local durationDisplay = "ALLE"
+		if isnumber( duration ) then
+			if duration > 1 then
+				durationDisplay = duration .. " Tage"
+			else
+				durationDisplay = duration .. " Tag"
+			end
+		end
+			
 				
 		for k, v in ipairs( list ) do
 			if #list == 0 or not tonumber(v.total) then
@@ -43,7 +66,7 @@ if SERVER then
 					Color( 50, 50, 50, 255 ), "[", 
 					Color( 190, 40, 40, 255 ), "Karmabet",
 					Color( 50, 50, 50, 255 ), "] ",
-					Color( 255, 255, 255, 255 ), "Deine Wettbalance: ",
+					Color( 255, 255, 255, 255 ), "Deine Wettbalance [" .. durationDisplay .. "]: ",
 					Color( 0, 255, 0, 255 ), v.total .. " ",
 					Color( 255, 255, 255, 255 ), "Karma!" )
 			else
@@ -51,7 +74,7 @@ if SERVER then
 					Color( 50, 50, 50, 255 ), "[", 
 					Color( 190, 40, 40, 255 ), "Karmabet",
 					Color( 50, 50, 50, 255 ), "] ",
-					Color( 255, 255, 255, 255 ), "Deine Wettbalance: ",
+					Color( 255, 255, 255, 255 ), "Deine Wettbalance [" .. durationDisplay .. "]: ",
 					Color( 255, 0, 0, 255 ), v.total .. " ",
 					Color( 255, 255, 255, 255 ), "Karma!" )
 			end
@@ -102,6 +125,7 @@ if SERVER then
 		end
 	end
 	
+	-- Shows the five lowest entries in the database
 	function karmabet_showWorstBetters( duration )
 		local list = sql.Query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date > (SELECT DATETIME('now', '-7 day')) GROUP BY steamid HAVING sum(amount) < 0 ORDER BY total DESC LIMIT 5" )
 		

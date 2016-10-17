@@ -32,7 +32,7 @@ function ulx.showmybetsummary( calling_ply, duration )
 	karmabet_showMyBetSummary( calling_ply, calling_ply:SteamID(), duration )
 end
 local showmybetsummary = ulx.command( CATEGORY, "ulx showmybetsummary", ulx.showmybetsummary, "!mybets" )
-showmybetsummary:addParam{ type=ULib.cmds.StringArg, hint="Amount of days to look back to. Can be 'all' or a number up to 31" }
+showmybetsummary:addParam{ type=ULib.cmds.StringArg, hint="'all' or 1-31", ULib.cmds.optional }
 showmybetsummary:defaultAccess( ULib.ACCESS_ALL )
 showmybetsummary:help( "Shows your total bets." )
 

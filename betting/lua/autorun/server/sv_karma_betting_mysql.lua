@@ -63,9 +63,31 @@ if SERVER then
 
 	db:connect()
 	
-	-- Shows the five highest entries in the database
-	function karmabet_showMyBetSummary( ply, steamid )
-		query( "SELECT sum(amount) as total FROM `karmabet` WHERE steamid = '" .. db:escape(steamid) .. "' LIMIT 1", function( list )
+	-- Shows the player's sum of all bets he placed
+	function karmabet_showMyBetSummary( ply, steamid, duration )
+	
+		local duration = tonumber( duration ) or "all"
+		if isnumber( duration ) then
+			duration = math.Clamp( duration, 1, 31 ) -- Limit lookbacks between 1 and 31
+		end
+		
+		local querystring = "SELECT sum(amount) as total FROM `karmabet` WHERE steamid = '" .. db:escape(steamid) .. "' LIMIT 1"
+		
+		if ( duration ~= "all" and duration <= 31 and duration > 0 ) then
+			querystring = "SELECT sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL " .. tonumber(duration) .. " DAY) AND steamid = '" .. db:escape(steamid) .. "' LIMIT 1"
+		end
+		
+		-- Format the reported range to be printed to chat
+		local durationDisplay = "ALLE"
+		if isnumber( duration ) then
+			if duration > 1 then
+				durationDisplay = duration .. " Tage"
+			else
+				durationDisplay = duration .. " Tag"
+			end
+		end
+			
+		query( querystring, function( list )
 			
 			if KARMABET_DEBUG then
 				print( "[Karmabet] showMyBetSummary table results:" ) 
@@ -87,7 +109,7 @@ if SERVER then
 						Color( 50, 50, 50, 255 ), "[", 
 						Color( 190, 40, 40, 255 ), "Karmabet",
 						Color( 50, 50, 50, 255 ), "] ",
-						Color( 255, 255, 255, 255 ), "Deine Wettbalance: ",
+						Color( 255, 255, 255, 255 ), "Deine Wettbalance [" .. durationDisplay .. "]: ",
 						Color( 0, 255, 0, 255 ), v.total .. " ",
 						Color( 255, 255, 255, 255 ), "Karma!" )
 				else
@@ -95,7 +117,7 @@ if SERVER then
 						Color( 50, 50, 50, 255 ), "[", 
 						Color( 190, 40, 40, 255 ), "Karmabet",
 						Color( 50, 50, 50, 255 ), "] ",
-						Color( 255, 255, 255, 255 ), "Deine Wettbalance: ",
+						Color( 255, 255, 255, 255 ), "Deine Wettbalance [" .. durationDisplay .. "]: ",
 						Color( 255, 0, 0, 255 ), v.total .. " ",
 						Color( 255, 255, 255, 255 ), "Karma!" )
 				end
@@ -144,6 +166,7 @@ if SERVER then
 		end)
 	end
 	
+	-- Shows the five lowest entries in the database
 	function karmabet_showWorstBetters( duration )
 		query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY steamid HAVING sum(amount) < 0 ORDER BY total ASC LIMIT 5", function( list )
 			
