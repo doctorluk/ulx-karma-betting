@@ -8,19 +8,19 @@ ulx.showmybetsummaryLastRun = 0
 
 local CATEGORY = "Karma Betting"
 
-function ulx.startkarmabet( calling_ply, amount, target )
+function ulx.startkarmabet( calling_ply, target, amount )
 	if karmabet_canBet( calling_ply, math.floor(amount), target ) then
 		-- ulx.fancyLogAdmin( calling_ply, "#A started betting #i Karma in favor of " .. target, amount )
 	end
 end
 local startkarmabet = ulx.command( CATEGORY, "ulx startkarmabet", ulx.startkarmabet, "!bet" )
-startkarmabet:addParam{ type=ULib.cmds.NumArg, hint="Menge, zwischen " .. KARMABET_MINIMUM_KARMA .. " und " .. KARMABET_MAXIMUM_KARMA, min=KARMABET_MINIMUM_KARMA, max=KARMABET_MAXIMUM_KARMA }
-startkarmabet:addParam{ type=ULib.cmds.StringArg, hint="'Traitor' oder 'Innocent'" }
+startkarmabet:addParam{ type=ULib.cmds.StringArg, hint="'Traitor' or 'Innocent'" }
+startkarmabet:addParam{ type=ULib.cmds.NumArg, hint="Amount, between " .. KARMABET_MINIMUM_KARMA .. " and " .. KARMABET_MAXIMUM_KARMA, min=KARMABET_MINIMUM_KARMA, max=KARMABET_MAXIMUM_KARMA }
 startkarmabet:defaultAccess( ULib.ACCESS_ALL )
 startkarmabet:help( "Starts a Karma bet." )
 
 
-function ulx.showmybetsummary( calling_ply )
+function ulx.showmybetsummary( calling_ply, duration )
 	if not calling_ply then return false end
 	
 	if ulx.showmybetsummaryLastRun + 5 > os.time() then
@@ -29,9 +29,10 @@ function ulx.showmybetsummary( calling_ply )
 	end
 	ulx.showmybetsummaryLastRun = os.time()
 	
-	karmabet_showMyBetSummary( calling_ply, calling_ply:SteamID() )
+	karmabet_showMyBetSummary( calling_ply, calling_ply:SteamID(), duration )
 end
 local showmybetsummary = ulx.command( CATEGORY, "ulx showmybetsummary", ulx.showmybetsummary, "!mybets" )
+showmybetsummary:addParam{ type=ULib.cmds.StringArg, hint="Amount of days to look back to. Can be 'all' or a number up to 31" }
 showmybetsummary:defaultAccess( ULib.ACCESS_ALL )
 showmybetsummary:help( "Shows your total bets." )
 
