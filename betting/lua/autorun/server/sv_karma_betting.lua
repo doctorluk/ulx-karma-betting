@@ -178,7 +178,9 @@ if SERVER then
 	end
 	
 	function karmabet_enoughCorpsesFound()
-		print(karmabet_corpses_found .. " " .. KARMABET_MINIMUM_IDENTIFIED_BODIES .. "\n")
+		if KARMABET_DEBUG then
+			print("[Karmabet] Corpses found: ".. karmabet_corpses_found .. ", KARMABET_MINIMUM_IDENTIFIED_BODIES: " .. KARMABET_MINIMUM_IDENTIFIED_BODIES)
+		end
 		return karmabet_corpses_found >= KARMABET_MINIMUM_IDENTIFIED_BODIES
 	end
 	

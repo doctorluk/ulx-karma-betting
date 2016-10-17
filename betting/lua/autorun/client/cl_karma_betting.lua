@@ -21,5 +21,4 @@ net.Receive( "karmabet_updatehud", function( net_response )
 	t_betcount = net.ReadInt( 32 )
 	i_betcount = net.ReadInt( 32 )
 	
-	print("[KARMA DEBUG] Received Server's betting call with T-Count: " .. t_betcount .. " and I-Count: " .. i_betcount)
 end)

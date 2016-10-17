@@ -19,14 +19,14 @@ if SERVER then
 	function karmabet_showMyBetSummary( ply, steamid )
 		local list = sql.Query( "SELECT sum(amount) as total FROM `karmabet` WHERE steamid = " .. sql.SQLStr(steamid) .. " LIMIT 1" )
 		
-			if KARMABET_DEBUG then
-				print( "[Karmabet] showMyBetSummary table results:" ) 
-				if list then
-					PrintTable(list)
-				else
-					print( "Empty list!" )
-				end
+		if KARMABET_DEBUG then
+			print( "[Karmabet] showMyBetSummary table results:" ) 
+			if list then
+				PrintTable(list)
+			else
+				print( "Empty list!" )
 			end
+		end
 				
 		for k, v in ipairs( list ) do
 			if #list == 0 or not tonumber(v.total) then
