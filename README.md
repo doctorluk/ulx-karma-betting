@@ -1,5 +1,4 @@
 # ULX Karma Betting
-## THIS PLUGIN IS CURRENTLY ONLY AVAILABLE IN GERMAN
 
 ## What it is for
 This plugin can be installed on Garry's Mod servers to enable betting of Karma while being dead or spectating.
