@@ -4,6 +4,13 @@
 
 if SERVER then
 	
+	if not KARMABET_LANG then
+		print("[KARMABET] ERROR! FAILED LOADING LANGUAGE! CHECK CONFIG AND RESTART SERVER!")
+		print("[KARMABET] ERROR! FAILED LOADING LANGUAGE! CHECK CONFIG AND RESTART SERVER!")
+		print("[KARMABET] ERROR! FAILED LOADING LANGUAGE! CHECK CONFIG AND RESTART SERVER!")
+		return
+	end
+	
 	KARMABET_CAN_BET = true
 	
 	karmabet_bet_total_t = 0
@@ -50,7 +57,7 @@ if SERVER then
 		local hidden = " "
 		
 		if puthidden then
-			hidden = "[VERSTECKT] "
+			hidden = KARMABET_LANG.echo_hidden
 		end
 		
 		for _, player in ipairs( player.GetHumans() ) do
@@ -60,9 +67,9 @@ if SERVER then
 				Color( 190, 40, 40, 255 ), "Karmabet",
 				Color( 50, 50, 50, 255 ), "]" .. hidden, 
 				Color( 255, 255, 0, 0 ), ply:Nick(),
-				Color( 60, 90, 100, 255 ), " wettet ",
+				Color( 60, 90, 100, 255 ), KARMABET_LANG.echo_bets,
 				Color( 190, 40, 40, 255), amount .. "",	
-				Color( 60, 90, 100, 255 ), " Karma auf das Team ", 
+				Color( 60, 90, 100, 255 ), KARMABET_LANG.echo_karmaonteam, 
 				color, target .. "")
 			end
 		end
@@ -78,25 +85,25 @@ if SERVER then
 	
 		-- Only dead/spectating players are allowed to bet
 		if calling_ply:Alive() and not calling_ply:IsSpec() then
-			karmabet_reportError( calling_ply, "Du kannst nur wetten, wenn du nicht lebst!" )
+			karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_deadalive )
 			return false
 		end
 		
 		-- Only allow betting while a round is active
 		if GetRoundState() ~= ROUND_ACTIVE then
-			karmabet_reportError( calling_ply, "Man kann nur während einer aktiven Runde wetten!" )
+			karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_activeround )
 			return false
 		end
 		
 		-- Prevent betting when betting is disabled
 		if not KARMABET_CAN_BET or KARMABET_HAS_RUN then
-			karmabet_reportError( calling_ply, "Zeit zum Wetten ist abgelaufen!" )
+			karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_timeup )
 			return false
 		end
 		
 		-- Prevent betting when slowmo (of end-round) is running
 		if game.GetTimeScale() ~= 1 then
-			karmabet_reportError( calling_ply, "Kann nicht während der Zeitlupe wetten! (Du Cheater!)" )
+			karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_slowmo )
 			return false
 		end
 		
@@ -107,13 +114,13 @@ if SERVER then
 		elseif target == "i" or target == "inno" or target == "innocent" then
 			target = "innocent"
 		else
-			karmabet_reportError( calling_ply, "Du hast kein Ziel eingegeben! Versuche T oder I für Traitor oder Innocent." )
+			karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_wrongtarget )
 			return false
 		end
 		
 		-- Check if player has enough karma to bet
 		if calling_ply:GetLiveKarma() < KARMABET_MINIMUM_LIVE_KARMA then
-			karmabet_reportError( calling_ply, "Dein Karma ist zu gering um zu wetten!" )
+			karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_notenoughkarma )
 			return false
 		end
 		
@@ -121,10 +128,10 @@ if SERVER then
 		if calling_ply:GetLiveKarma() - amount < KARMABET_MINIMUM_LIVE_KARMA then
 			amount = math.floor( calling_ply:GetLiveKarma() - KARMABET_MINIMUM_LIVE_KARMA )
 			if amount == 0 then
-				karmabet_reportError( calling_ply, "Dein verbleibendes Karma ist zu gering um zu wetten!" )
+				karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_notenoughremainingkarma )
 				return false
 			end
-			karmabet_reportNotice( calling_ply, "Dein Karma ist low! Es konnte nur " .. amount .. " Karma gesetzt werden!" )
+			karmabet_reportNotice( calling_ply, KARMABET_LANG.cantbet_lowkarma_1 .. amount .. KARMABET_LANG.cantbet_lowkarma_2 )
 		end
 		
 		if not karmabet_enoughCorpsesFound() then
@@ -146,7 +153,7 @@ if SERVER then
 			
 			-- Only allow betting for the same team again
 			if saved_target ~= target then
-				karmabet_reportError( calling_ply, "Du kannst nur dem gleichen Team mehr wetten und nicht mehr wechseln!" )
+				karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_wrongteam )
 				return false
 			end
 			
@@ -158,7 +165,7 @@ if SERVER then
 			
 			-- Report hit maximum
 			if amount == 0 then
-				karmabet_reportError( calling_ply, "Du kannst nicht mehr als " .. KARMABET_MAXIMUM_KARMA .. " wetten!" )
+				karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_maxbetwarn_1 .. KARMABET_MAXIMUM_KARMA .. KARMABET_LANG.cantbet_maxbetwarn_2 )
 				return false
 			end
 			
@@ -269,6 +276,7 @@ if SERVER then
 		net.Start( "karmabet_updatehud" )
 		net.WriteInt( karmabet_bet_total_t, 32 )
 		net.WriteInt( karmabet_bet_total_i, 32 )
+		net.WriteInt( KARMABET_LANG.id, 8 )
 		net.Broadcast()
 		
 	end
@@ -291,7 +299,7 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
 				Color( 50, 50, 50, 255 ), "] ", 
-				Color( 255, 255, 0, 0 ), "Noch 20 Sekunden um zu wetten!" )
+				Color( 255, 255, 0, 0 ), KARMABET_LANG.timer_timeleft )
 			
 		end )
 		
@@ -301,7 +309,7 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
 				Color( 50, 50, 50, 255 ), "] ", 
-				Color( 255, 255, 0, 0 ), "Wetten geschlossen!" )
+				Color( 255, 255, 0, 0 ), KARMABET_LANG.timer_betsclosed )
 			
 			KARMABET_CAN_BET = false
 			ServerLog("[Karmabet] Bets closed!\n")
@@ -358,12 +366,12 @@ if SERVER then
 						
 						ULib.tsayColor( nil, false,
 							Color( 50, 50, 50, 255 ), "[", 
-							Color( 190, 40, 40, 255), "Karmabet",
-							Color( 50, 50, 50, 255), "] ",
+							Color( 190, 40, 40, 255 ), "Karmabet",
+							Color( 50, 50, 50, 255 ), "] ",
 							Color( 255, 255, 0, 0 ), ply:Nick(),
-							Color( 0, 255, 0, 255), " gewinnt ",
-							Color( 255, 255, 255, 255), karmaReturned .. "",
-							Color( 0, 255, 0, 255), " Karma!" )
+							Color( 0, 255, 0, 255 ), KARMABET_LANG.roundend_wins,
+							Color( 255, 255, 255, 255 ), karmaReturned .. "",
+							Color( 0, 255, 0, 255 ), " " .. KARMABET_LANG.general_karma .. "!" )
 						
 						local newKarma = ply:GetLiveKarma() + karmaReturned
 						if newKarma > GetConVar("ttt_karma_max"):GetInt() then
@@ -376,12 +384,12 @@ if SERVER then
 					
 						ULib.tsayColor( nil, false,
 							Color( 50, 50, 50, 255 ), "[", 
-							Color( 190, 40, 40, 255), "Karmabet",
-							Color( 50, 50, 50, 255), "] ",
+							Color( 190, 40, 40, 255 ), "Karmabet",
+							Color( 50, 50, 50, 255 ), "] ",
 							Color( 255, 255, 0, 0 ), ply:Nick(),
-							Color( 255, 0, 0, 255), " verliert ",
-							Color( 255, 255, 255, 255), amount .. "",
-							Color( 255, 0, 0, 255), " Karma!" )
+							Color( 255, 0, 0, 255 ), KARMABET_LANG.roundend_loses,
+							Color( 255, 255, 255, 255 ), amount .. "",
+							Color( 255, 0, 0, 255 ), " " .. KARMABET_LANG.general_karma .. "!" )
 						
 						karmabet_tbl_results[id] = { amount, target }
 					end
@@ -407,6 +415,7 @@ if SERVER then
 		net.Start( "karmabet_updatehud" )
 		net.WriteInt( karmabet_bet_total_t, 32 )
 		net.WriteInt( karmabet_bet_total_i, 32 )
+		net.WriteInt( KARMABET_LANG.id, 8 )
 		net.Send( ply )
 	end
 	hook.Add( "PlayerInitialSpawn", "karmabet_onPlayerConnect", karmabet_onPlayerConnect )

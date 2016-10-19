@@ -41,12 +41,12 @@ if SERVER then
 		end
 		
 		-- Format the reported range to be printed to chat
-		local durationDisplay = "ALLE"
+		local durationDisplay = KARMABET_LANG.mybets_all
 		if isnumber( duration ) then
 			if duration > 1 then
-				durationDisplay = duration .. " Tage"
+				durationDisplay = duration .. KARMABET_LANG.mybets_days
 			else
-				durationDisplay = duration .. " Tag"
+				durationDisplay = duration .. KARMABET_LANG.mybets_day
 			end
 		end
 			
@@ -57,7 +57,7 @@ if SERVER then
 					Color( 50, 50, 50, 255 ), "[", 
 					Color( 190, 40, 40, 255 ), "Karmabet",
 					Color( 50, 50, 50, 255 ), "] ",
-					Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!" )
+					Color( 255, 255, 0, 255 ), KARMABET_LANG.db_noentries )
 				return
 			end
 			
@@ -66,17 +66,17 @@ if SERVER then
 					Color( 50, 50, 50, 255 ), "[", 
 					Color( 190, 40, 40, 255 ), "Karmabet",
 					Color( 50, 50, 50, 255 ), "] ",
-					Color( 255, 255, 255, 255 ), "Deine Wettbalance [" .. durationDisplay .. "]: ",
+					Color( 255, 255, 255, 255 ), KARMABET_LANG.mybets_balance .. " [" .. durationDisplay .. "]: ",
 					Color( 0, 255, 0, 255 ), v.total .. " ",
-					Color( 255, 255, 255, 255 ), "Karma!" )
+					Color( 255, 255, 255, 255 ), KARMABET_LANG.general_karma_ex )
 			else
 				ULib.tsayColor( ply, true,
 					Color( 50, 50, 50, 255 ), "[", 
 					Color( 190, 40, 40, 255 ), "Karmabet",
 					Color( 50, 50, 50, 255 ), "] ",
-					Color( 255, 255, 255, 255 ), "Deine Wettbalance [" .. durationDisplay .. "]: ",
+					Color( 255, 255, 255, 255 ), KARMABET_LANG.mybets_balance .. " [" .. durationDisplay .. "]: ",
 					Color( 255, 0, 0, 255 ), v.total .. " ",
-					Color( 255, 255, 255, 255 ), "Karma!" )
+					Color( 255, 255, 255, 255 ), KARMABET_LANG.general_karma_ex )
 			end
 		end
 	end
@@ -99,7 +99,7 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
 				Color( 50, 50, 50, 255 ), "] ",
-				Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!" )
+				Color( 255, 255, 0, 255 ), KARMABET_LANG.db_noentries )
 			return
 		end
 		
@@ -107,10 +107,10 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
 				Color( 50, 50, 50, 255 ), "] ",
-				Color( 255, 255, 0, 255 ), "Die ", 
-				Color( 0, 255, 0, 255 ), "besten ",
+				Color( 255, 255, 0, 255 ), KARMABET_LANG.bestbets_the, 
+				Color( 0, 255, 0, 255 ), KARMABET_LANG.bestbets_best,
 				Color( 255, 255, 255, 255 ), #list .. " ",
-				Color( 255, 255, 0, 255 ), "Wetthelden: " )
+				Color( 255, 255, 0, 255 ), KARMABET_LANG.bestbets_betters )
 				
 		for k, v in ipairs( list ) do
 			ULib.tsayColor( nil, true,
@@ -119,9 +119,9 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "] ",
 				Color( 0, 255, 0, 255 ), "#" .. k .. ": ",
 				Color( 255, 255, 0, 255 ), v.name .. " ",
-				Color( 255, 255, 255, 255 ), "mit ",
+				Color( 255, 255, 255, 255 ), KARMABET_LANG.bestbets_with,
 				Color( 0, 255, 0, 255 ), v.total .. " ",
-				Color( 255, 255, 255, 255 ), "Karma!" )
+				Color( 255, 255, 255, 255 ), KARMABET_LANG.general_karma_ex )
 		end
 	end
 	
@@ -143,7 +143,7 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
 				Color( 50, 50, 50, 255 ), "] ",
-				Color( 255, 255, 0, 255 ), "Leider keine Einträge gefunden!" )
+				Color( 255, 255, 0, 255 ), KARMABET_LANG.db_noentries )
 			return
 		end
 		
@@ -151,10 +151,10 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
 				Color( 50, 50, 50, 255 ), "] ",
-				Color( 255, 255, 0, 255 ), "Die ", 
-				Color( 255, 0, 0, 255 ), "schlechtesten ",
+				Color( 255, 255, 0, 255 ), KARMABET_LANG.worstbets_the, 
+				Color( 255, 0, 0, 255 ), KARMABET_LANG.worstbets_worst,
 				Color( 255, 255, 255, 255 ), #list .. " ",
-				Color( 255, 255, 0, 255 ), "Wettnoobs: " )
+				Color( 255, 255, 0, 255 ), KARMABET_LANG.worstbets_betters )
 				
 		for k, v in ipairs( list ) do
 			ULib.tsayColor( nil, true,
@@ -163,9 +163,9 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "] ",
 				Color( 255, 0, 0, 255 ), "#" .. k .. ": ",
 				Color( 255, 255, 0, 255 ), v.name .. " ",
-				Color( 255, 255, 255, 255 ), "mit ",
+				Color( 255, 255, 255, 255 ), KARMABET_LANG.worstbets_with,
 				Color( 255, 0, 0, 255 ), v.total .. " ",
-				Color( 255, 255, 255, 255 ), "Karma!" )
+				Color( 255, 255, 255, 255 ), KARMABET_LANG.general_karma_ex )
 		end
 	end
 	

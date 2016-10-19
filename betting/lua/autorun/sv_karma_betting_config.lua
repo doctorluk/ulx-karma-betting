@@ -8,8 +8,11 @@
 -- Refer to lua/autorun/server/sv_karma_betting_mysql.lua for configuration options
 KARMABET_USE_MYSQL = false
 
--- Configure the minimum amount of identified corpses to show the total amount of placed bets
--- publicly
+-- The language of the plugin
+-- Possible settings: "english" or "german"
+KARMABET_LANGUAGE = "english"
+
+-- Configure the minimum amount of identified corpses to show the total amount of placed bets publicly
 KARMABET_MINIMUM_IDENTIFIED_BODIES = 2
 
 -- Minimum amount of karma to bet
