@@ -1,6 +1,6 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.1
+-- Version: 1.2
 
 -- NOTE: To add client-side translations of the running bet display, you need to edit cl_karma_betting.lua aswell!
 
@@ -52,5 +52,9 @@ KARMABET_LANG.worstbets_the = "Die "
 KARMABET_LANG.worstbets_worst = "schlechtesten "
 KARMABET_LANG.worstbets_betters = "Wettnoobs: "
 KARMABET_LANG.worstbets_with = "mit "
+
+KARMABET_LANG.ulx_cd_mybets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."
+KARMABET_LANG.ulx_cd_bestbets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."
+KARMABET_LANG.ulx_cd_worstbets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."
 
 print( "[Karmabet] Loaded " .. table.Count(KARMABET_LANG) .. " language strings for language " .. KARMABET_LANGUAGE )

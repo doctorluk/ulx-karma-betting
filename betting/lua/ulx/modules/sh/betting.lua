@@ -1,17 +1,17 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.1
+-- Version: 1.2
 
-ulx.showbestbettersLastRun = 0
-ulx.showworstbettersLastRun = 0
-ulx.showmybetsummaryLastRun = 0
+ulx.bestbetsLastRun = 0
+ulx.worstbetsLastRun = 0
+ulx.mybetsLastRun = 0
 
 local CATEGORY = "Karma Betting"
 
 function ulx.startkarmabet( calling_ply, target, amount )
-	if karmabet_canBet( calling_ply, math.floor(amount), target ) then
-		-- ulx.fancyLogAdmin( calling_ply, "#A started betting #i Karma in favor of " .. target, amount )
-	end
+
+	karmabet_canBet( calling_ply, math.floor(amount), target )
+	
 end
 local startkarmabet = ulx.command( CATEGORY, "ulx startkarmabet", ulx.startkarmabet, "!bet" )
 startkarmabet:addParam{ type=ULib.cmds.StringArg, hint="'Traitor' or 'Innocent'" }
@@ -20,47 +20,51 @@ startkarmabet:defaultAccess( ULib.ACCESS_ALL )
 startkarmabet:help( "Starts a Karma bet." )
 
 
-function ulx.showmybetsummary( calling_ply, duration )
+function ulx.mybets( calling_ply, duration )
+
 	if not calling_ply then return false end
 	
-	if ulx.showmybetsummaryLastRun + 5 > os.time() then
-		karmabet_reportError( calling_ply, "Dieser Befehl wurde gerade erst ausgeführt! Versuche es in 5 Sekunden erneut.")
+	if ulx.mybetsLastRun + KARMABET_MYBETS_COOLDOWN > os.time() then
+		karmabet_reportError( calling_ply, KARMABET_LANG.ulx_cd_mybets )
 		return
 	end
-	ulx.showmybetsummaryLastRun = os.time()
+	ulx.mybetsLastRun = os.time()
 	
 	karmabet_showMyBetSummary( calling_ply, calling_ply:SteamID(), duration )
+	
 end
-local showmybetsummary = ulx.command( CATEGORY, "ulx showmybetsummary", ulx.showmybetsummary, "!mybets" )
-showmybetsummary:addParam{ type=ULib.cmds.StringArg, hint="'all' or 1-31", ULib.cmds.optional }
-showmybetsummary:defaultAccess( ULib.ACCESS_ALL )
-showmybetsummary:help( "Shows your total bets." )
+local mybets = ulx.command( CATEGORY, "ulx mybets", ulx.mybets, "!mybets" )
+mybets:addParam{ type=ULib.cmds.StringArg, hint="'all' or 1-31", ULib.cmds.optional }
+mybets:defaultAccess( ULib.ACCESS_ALL )
+mybets:help( "Shows your total bets." )
 
 
-function ulx.showbestbetters( calling_ply )
+function ulx.bestbets( calling_ply )
 
-	if ulx.showbestbettersLastRun + 180 > os.time() then
-		karmabet_reportError( calling_ply, "Warte, bis du den Befehl wieder ausführst!")
+	if ulx.bestbetsLastRun + KARMABET_BESTBETS_COOLDOWN > os.time() then
+		karmabet_reportError( calling_ply, KARMABET_LANG.ulx_cd_bestbets )
 		return
 	end
-	ulx.showbestbettersLastRun = os.time()
+	ulx.bestbetsLastRun = os.time()
 	
 	karmabet_showBestBetters()
+	
 end
-local showbestbetters = ulx.command( CATEGORY, "ulx showbestbetters", ulx.showbestbetters, "!bestbets" )
-showbestbetters:defaultAccess( ULib.ACCESS_ALL )
-showbestbetters:help( "Shows best betters of last 7 days." )
+local bestbets = ulx.command( CATEGORY, "ulx bestbets", ulx.bestbets, "!bestbets" )
+bestbets:defaultAccess( ULib.ACCESS_ALL )
+bestbets:help( "Shows best betters of last 7 days." )
 
-function ulx.showworstbetters( calling_ply )
+function ulx.worstbets( calling_ply )
 
-	if ulx.showworstbettersLastRun + 180 > os.time() then
-		karmabet_reportError( calling_ply, "Warte, bis du den Befehl wieder ausführst!")
+	if ulx.worstbetsLastRun + KARMABET_WORSTBETS_COOLDOWN > os.time() then
+		karmabet_reportError( calling_ply, KARMABET_LANG.ulx_cd_worstbets )
 		return
 	end
-	ulx.showworstbettersLastRun = os.time()
+	ulx.worstbetsLastRun = os.time()
 	
 	karmabet_showWorstBetters()
+	
 end
-local showworstbetters = ulx.command( CATEGORY, "ulx showworstbetters", ulx.showworstbetters, "!worstbets" )
-showworstbetters:defaultAccess( ULib.ACCESS_ALL )
-showworstbetters:help( "Shows worst betters of last 7 days." )
+local worstbets = ulx.command( CATEGORY, "ulx worstbets", ulx.worstbets, "!worstbets" )
+worstbets:defaultAccess( ULib.ACCESS_ALL )
+worstbets:help( "Shows worst betters of last 7 days." )

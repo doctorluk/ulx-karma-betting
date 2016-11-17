@@ -1,6 +1,6 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.1
+-- Version: 1.2
 
 local betting_pos_x = 150
 local betting_pos_y = ScrH() / 2 - (ScrH() / 5)
