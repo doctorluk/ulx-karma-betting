@@ -1,6 +1,6 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.2
+-- Version: 1.3
 
 if SERVER then
 	
@@ -44,7 +44,7 @@ if SERVER then
 	end
 	
 	-- Show spectating/dead players that someone has placed a bet
-	function karmabet_echoBetPlacement( ply, amount, target, puthidden )
+	function karmabet_echoBetPlacement( ply, amount, target, puthidden, all )
 	
 		local color = Color( 0, 255, 0, 255 )
 		if target == "innocent" then
@@ -55,9 +55,14 @@ if SERVER then
 		end
 		
 		local hidden = " "
+		local allin = ""
 		
 		if puthidden then
 			hidden = KARMABET_LANG.echo_hidden
+		end
+		
+		if all then
+			allin = KARMABET_LANG.echo_allin
 		end
 		
 		for _, player in ipairs( player.GetHumans() ) do
@@ -66,6 +71,7 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "[", 
 				Color( 190, 40, 40, 255 ), "Karmabet",
 				Color( 50, 50, 50, 255 ), "]" .. hidden, 
+				Color( 200, 200, 0, 255 ), allin, 
 				Color( 255, 255, 0, 0 ), ply:Nick(),
 				Color( 60, 90, 100, 255 ), KARMABET_LANG.echo_bets,
 				Color( 190, 40, 40, 255), amount .. "",	
@@ -77,7 +83,7 @@ if SERVER then
 	end
 	
 	-- Big check whether or not someone can bet
-	function karmabet_canBet( calling_ply, amount, target )
+	function karmabet_canBet( calling_ply, amount, target, all )
 	
 		local puthidden = false
 	
@@ -124,17 +130,8 @@ if SERVER then
 			return false
 		end
 		
-		-- Reduce bet depending on how much Karma the player has left
-		if calling_ply:GetLiveKarma() - amount < KARMABET_MINIMUM_LIVE_KARMA then
-			amount = math.floor( calling_ply:GetLiveKarma() - KARMABET_MINIMUM_LIVE_KARMA )
-			if amount == 0 then
-				karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_notenoughremainingkarma )
-				return false
-			end
-			karmabet_reportNotice( calling_ply, KARMABET_LANG.cantbet_lowkarma_1 .. amount .. KARMABET_LANG.cantbet_lowkarma_2 )
-		end
-		
-		if not karmabet_enoughCorpsesFound() then
+		-- Make this bet only visible for spectators and dead players
+		if not puthidden and not karmabet_enoughCorpsesFound() then
 			puthidden = true
 		end
 		
@@ -150,6 +147,7 @@ if SERVER then
 		if tmptable then
 			local saved_amount = tmptable[1]
 			local saved_target = tmptable[2]
+			local was_all = tmptable[3]
 			
 			-- Only allow betting for the same team again
 			if saved_target ~= target then
@@ -157,8 +155,21 @@ if SERVER then
 				return false
 			end
 			
+			-- Player went all-in, he can't do anything 
+			if was_all then
+				karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_allin )
+				return false
+			end
+			
 			-- Limit new amount to maximum
-			local maxAdd = KARMABET_MAXIMUM_KARMA - saved_amount
+			local maxAdd = 0
+			
+			if all then
+				maxAdd = KARMABET_AMOUNT_ALL - saved_amount
+			else
+				maxAdd = KARMABET_MAXIMUM_KARMA - saved_amount
+			end
+			
 			if amount > maxAdd then
 				amount = maxAdd
 			end
@@ -169,19 +180,42 @@ if SERVER then
 				return false
 			end
 			
+			-- Check for lower karma limit
+			amount = karmabet_getAdjustedBetForLowKarma( calling_ply, amount )
+			if amount == 0 then return false end
+			
 			-- Update player's saved amount
 			local new_saved_amount = amount + saved_amount
 			if puthidden then
-				karmabet_tbl_betters_hidden[calling_ply:SteamID()] = { new_saved_amount, target }
+				karmabet_tbl_betters_hidden[calling_ply:SteamID()] = { new_saved_amount, target, all }
 			else
-				karmabet_tbl_betters[calling_ply:SteamID()] = { new_saved_amount, target }
+				karmabet_tbl_betters[calling_ply:SteamID()] = { new_saved_amount, target, all }
 			end
+		else
+			-- Check for lower karma limit
+			amount = karmabet_getAdjustedBetForLowKarma( calling_ply, amount )
+			if amount == 0 then return false end
 		end
 		
 		-- If all passes, start bet
-		karmabet_start( calling_ply, amount, target, puthidden )
+		karmabet_start( calling_ply, amount, target, puthidden, all )
 		
 		return true
+	end
+	
+	-- Adjusts bet to remaining karma above minimum
+	function karmabet_getAdjustedBetForLowKarma( ply, amount )
+	
+		if ply:GetLiveKarma() - amount < KARMABET_MINIMUM_LIVE_KARMA then
+			amount = math.floor( ply:GetLiveKarma() - KARMABET_MINIMUM_LIVE_KARMA )
+			if amount == 0 then
+				karmabet_reportError( ply, KARMABET_LANG.cantbet_notenoughremainingkarma )
+				return amount
+			end
+			karmabet_reportNotice( ply, KARMABET_LANG.cantbet_lowkarma_1 .. amount .. KARMABET_LANG.cantbet_lowkarma_2 )
+		end
+		return amount
+		
 	end
 	
 	function karmabet_enoughCorpsesFound()
@@ -192,12 +226,12 @@ if SERVER then
 	end
 	
 	-- Actually start the bet
-	function karmabet_start( calling_ply, amount, target, puthidden )
+	function karmabet_start( calling_ply, amount, target, puthidden, all )
+	
+		local amountSending = 0
 	
 		-- Reduce player's karma by the amount he bet
 		calling_ply:SetLiveKarma( calling_ply:GetLiveKarma() - amount )
-		
-		local amountSending = 0
 		
 		-- Add to global counter
 		if target == "traitor" then
@@ -211,23 +245,23 @@ if SERVER then
 		-- Add player to table of players who have placed a bet
 		if puthidden then
 			if not karmabet_tbl_betters_hidden[calling_ply:SteamID()] then
-				karmabet_tbl_betters_hidden[calling_ply:SteamID()] = { amount, target }
+				karmabet_tbl_betters_hidden[calling_ply:SteamID()] = { amount, target, all }
 			end
 		else
 			if not karmabet_tbl_betters[calling_ply:SteamID()] then
-				karmabet_tbl_betters[calling_ply:SteamID()] = { amount, target }
+				karmabet_tbl_betters[calling_ply:SteamID()] = { amount, target, all }
 			end
 		end
 		-- PrintTable( karmabet_tbl_betters )
 		
-		karmabet_echoBetPlacement( calling_ply, amount, target, puthidden )
+		karmabet_echoBetPlacement( calling_ply, amount, target, puthidden, all )
 		
 		if not puthidden then karmabet_updateAllPlayers() end
 		
 	end
 	
 	-- Function called when finding a player
-	function karmabet_onBodyFound(ply, deadply, rag)
+	function karmabet_onBodyFound( ply, deadply, rag )
 		if ply and deadply then
 			karmabet_corpses_found = karmabet_corpses_found + 1
 			-- karmabet_reportNotice( nil, "[DEBUG] Found corpse of player " .. deadply:Nick() .. ", karmabet_corpses_found: " .. karmabet_corpses_found )
@@ -237,7 +271,7 @@ if SERVER then
 			for id, entry in pairs( karmabet_tbl_betters_hidden ) do
 				local ply = player.GetBySteamID( id )
 				if ply then -- See if he's actually on the server
-					karmabet_tbl_betters[id] = { entry[1], entry[2] }
+					karmabet_tbl_betters[id] = { entry[1], entry[2], entry[3] }
 				end
 				
 			end
@@ -250,6 +284,7 @@ if SERVER then
 	
 	-- Lazy refresh of running bets
 	function karmabet_refresh()
+	
 		local bet_i = 0
 		local bet_t = 0
 		
@@ -320,6 +355,7 @@ if SERVER then
 	
 	-- Act after a round has ended
 	function karmabet_onRoundEnd( winning_team )
+	
 		if not KARMABET_HAS_RUN then
 		
 			KARMABET_HAS_RUN = true
@@ -355,8 +391,10 @@ if SERVER then
 			
 				local ply = player.GetBySteamID( id )
 				if ply then
+				
 					local amount = entry[1]
 					local target = entry[2]
+					local allin = entry[3]
 					
 					if target == karmabet_winner then
 					
@@ -374,9 +412,7 @@ if SERVER then
 							Color( 0, 255, 0, 255 ), " " .. KARMABET_LANG.general_karma .. "!" )
 						
 						local newKarma = ply:GetLiveKarma() + karmaReturned
-						if newKarma > GetConVar("ttt_karma_max"):GetInt() then
-							newKarma = GetConVar("ttt_karma_max"):GetInt()
-						end
+						if newKarma > GetConVar("ttt_karma_max"):GetInt() then newKarma = GetConVar("ttt_karma_max"):GetInt() end
 						ply:SetBaseKarma( newKarma )
 						ply:SetLiveKarma( newKarma )
 						

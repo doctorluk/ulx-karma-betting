@@ -1,6 +1,6 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.2
+-- Version: 1.3
 
 -- NOTE: To add client-side translations of the running bet display, you need to edit cl_karma_betting.lua aswell!
 
@@ -14,6 +14,7 @@ KARMABET_LANG.general_karma = "Karma"
 KARMABET_LANG.general_karma_ex = "Karma!"
 
 KARMABET_LANG.echo_hidden = "[VERSTECKT] "
+KARMABET_LANG.echo_allin = ">ALL IN< "
 KARMABET_LANG.echo_bets = " wettet "
 KARMABET_LANG.echo_karmaonteam = " Karma auf das Team "
 
@@ -26,6 +27,7 @@ KARMABET_LANG.cantbet_notenoughkarma = "Dein Karma ist zu gering um zu wetten!"
 KARMABET_LANG.cantbet_notenoughremainingkarma = "Dein verbleibendes Karma ist zu gering um zu wetten!"
 KARMABET_LANG.cantbet_lowkarma_1 = "Dein Karma ist low! Es konnte nur " -- + amount
 KARMABET_LANG.cantbet_lowkarma_2 = " Karma gesetzt werden!"
+KARMABET_LANG.cantbet_allin = "Du bist all-in gegangen. Jetzt kannst du nur noch warten!"
 KARMABET_LANG.cantbet_wrongteam = "Du kannst nur dem gleichen Team mehr wetten und nicht mehr wechseln!"
 KARMABET_LANG.cantbet_maxbetwarn_1 = "Du kannst nicht mehr als " -- + amount
 KARMABET_LANG.cantbet_maxbetwarn_2 = " wetten!"
@@ -53,6 +55,7 @@ KARMABET_LANG.worstbets_worst = "schlechtesten "
 KARMABET_LANG.worstbets_betters = "Wettnoobs: "
 KARMABET_LANG.worstbets_with = "mit "
 
+KARMABET_LANG.ulx_syntax = "Zahl zwischen " .. KARMABET_MINIMUM_KARMA .. " und " .. KARMABET_MAXIMUM_KARMA .. " ODER 'all' (= " .. KARMABET_AMOUNT_ALL .. ")"
 KARMABET_LANG.ulx_cd_mybets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."
 KARMABET_LANG.ulx_cd_bestbets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."
 KARMABET_LANG.ulx_cd_worstbets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."

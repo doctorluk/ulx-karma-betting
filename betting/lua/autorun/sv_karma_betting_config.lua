@@ -1,6 +1,6 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.2
+-- Version: 1.3
 
 -- If set to false it will use the SQLite database within the server's installation to store the progress
 -- Set to true to use MySQL to save the karmabet progress
