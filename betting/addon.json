@@ -1,0 +1,8 @@
+{
+	"title"		: "Luk's ULX Karma Betting for TTT",
+	"type"		: "ServerContent",
+	"tags"		: [ "fun" ],
+	"ignore"	: [
+		"*.psd"
+	]
+}
