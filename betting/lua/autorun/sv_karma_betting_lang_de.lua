@@ -4,7 +4,7 @@
 
 -- NOTE: To add client-side translations of the running bet display, you need to edit cl_karma_betting.lua aswell!
 
-if KARMABET_LANGUAGE ~= "german" then return end
+if GetConVar( "karmabet_language" ):GetString() ~= "german" then return end
 
 KARMABET_LANG = {}
 
@@ -55,9 +55,9 @@ KARMABET_LANG.worstbets_worst = "schlechtesten "
 KARMABET_LANG.worstbets_betters = "Wettnoobs: "
 KARMABET_LANG.worstbets_with = "mit "
 
-KARMABET_LANG.ulx_syntax = "Zahl zwischen " .. KARMABET_MINIMUM_KARMA .. " und " .. KARMABET_MAXIMUM_KARMA .. " ODER 'all' (= " .. KARMABET_AMOUNT_ALL .. ")"
+KARMABET_LANG.ulx_syntax = "Zahl zwischen " .. GetConVar( "karmabet_min_karma" ):GetInt() .. " und " .. GetConVar( "karmabet_max_karma" ):GetInt() .. " ODER 'all' (= " .. GetConVar( "karmabet_allin_karma" ):GetInt() .. ")"
 KARMABET_LANG.ulx_cd_mybets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."
 KARMABET_LANG.ulx_cd_bestbets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."
 KARMABET_LANG.ulx_cd_worstbets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."
 
-print( "[Karmabet] Loaded " .. table.Count(KARMABET_LANG) .. " language strings for language " .. KARMABET_LANGUAGE )
+print( "[Karmabet] Loaded " .. table.Count(KARMABET_LANG) .. " language strings for language " .. GetConVar( "karmabet_language" ):GetString() )
