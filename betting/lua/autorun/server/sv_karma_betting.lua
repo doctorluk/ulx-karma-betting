@@ -1,6 +1,5 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.3
 
 if SERVER then
 	
