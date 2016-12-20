@@ -25,13 +25,21 @@ if SERVER then
 		local DATABASE_PASSWORD = GetConVar( "karmabet_mysql_pw" ):GetString()
 		local DATABASE_PORT = GetConVar( "karmabet_mysql_port" ):GetInt()
 		
-		if DATABASE_HOST == "none" or DATABASE_NAME == "none" or DATABASE_USERNAME == "none" or DATABASE_PASSWORD == "none" then
+		if 
+		DATABASE_HOST == GetConVar( "karmabet_mysql_host" ):GetDefault()
+		or 
+		DATABASE_NAME == GetConVar( "karmabet_mysql_dbname" ):GetDefault()
+		or 
+		DATABASE_USERNAME == GetConVar( "karmabet_mysql_username" ):GetDefault()
+		or 
+		DATABASE_PASSWORD == GetConVar( "karmabet_mysql_pw" ):GetDefault()
+		then
 			print("[Karmabet][ERROR] Your MySQL Database Settings are missing!")
 			print("[Karmabet][ERROR] Your MySQL Database Settings are missing!")
 			print("[Karmabet][ERROR] Your MySQL Database Settings are missing!")
 			print("[Karmabet][ERROR] Loading SQLite Module instead!")
 			hook.Call( "karmabet_loadsqlite" )
-			return false
+			return
 		end
 
 		-- Send text to console to know we're inside here

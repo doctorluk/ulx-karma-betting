@@ -2,24 +2,24 @@
 -- http://steamcommunity.com/id/doctorluk/
 -- Version: 1.3
 if SERVER then
-	
-	function karmabet_loadSQLite( force )
+
+	local function loadSQLite( force )
 		-- This function runs when the server is fully loaded
 		-- All cvars have been read and are available within this function
 
-		hook.Remove( "Think", "karmabet_sqlite" ) -- Only run this callback once
+		hook.Remove( "Think", "karmabet_sqlite_think" ) -- Only run this callback once
 
 		-- We can now make sure save mode has been set to "sqlite"
 		if not force and string.lower( GetConVar( "karmabet_savemode" ):GetString() ) == "mysql" then
 			return -- Stop! Save mode is not sqlite...
 		end
 		
+		-- We fall back to SQLite if the savemode was messed up
 		if not force and string.lower( GetConVar( "karmabet_savemode" ):GetString() ) ~= "sqlite" then
 			print("[Karmabet] Misconfiguration of 'karmabet_savemode', falling back to SQLite!")
-		else
-			print("[Karmabet] SQLite Module has been loaded.")
 		end
 		
+		print("[Karmabet] SQLite Module has been loaded.")
 		
 		local query_success = nil
 		
@@ -240,7 +240,7 @@ if SERVER then
 			
 		end 
 	end
-	hook.Add( "Think", "karmabet_sqlite", karmabet_loadSQLite( nil ) )
-	hook.Add( "karmabet_loadsqlite", "karmabet_sqlite", karmabet_loadSQLite( true ) )
+	hook.Add( "Think", "karmabet_sqlite_think", loadSQLite )
+	hook.Add( "karmabet_loadsqlite", "karmabet_sqlite_call", function() loadSQLite( true ) end )
 	
 end
