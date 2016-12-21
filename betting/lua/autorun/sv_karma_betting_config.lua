@@ -1,7 +1,11 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.3
 
+--[[
+
+	SERVER CONFIG SETTINGS
+
+]]
 -- Saving settings
 CreateConVar( "karmabet_savemode", "sqlite", {FCVAR_DONTRECORD}, "" )
 CreateConVar( "karmabet_mysql_host", "none", {FCVAR_DONTRECORD, FCVAR_PROTECTED}, "" )
@@ -42,3 +46,12 @@ CreateConVar( "karmabet_worstbets_cooldown", "180", {FCVAR_DONTRECORD}, "" )
 
 -- Print debug messages to console
 CreateConVar( "karmabet_debug", "0", {FCVAR_DONTRECORD}, "" )
+
+--[[
+
+	OTHER STATIC CONFIGS
+
+]]
+-- List of valid languages within the addon
+KARMABET_VALID_LANGUAGES = { english = true, german = true }
+KARMABET_LANG = {}
