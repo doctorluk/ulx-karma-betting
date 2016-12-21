@@ -17,14 +17,14 @@ function ulx.startkarmabet( calling_ply, target, amount )
 	if isnumber( tonumber( amount ) ) then
 		amount = math.floor( tonumber( amount ) )
 		
-		if amount < KARMABET_MINIMUM_KARMA or amount > KARMABET_MAXIMUM_KARMA then
+		if amount < GetConVar( "karmabet_min_karma" ):GetInt() or amount > GetConVar( "karmabet_max_karma" ):GetInt() then
 			karmabet_reportError( calling_ply, KARMABET_LANG.ulx_syntax )
 			return false
 		end
 	
 	-- 'all' CHECK
 	elseif string.lower( amount ) == "all" then
-		amount = KARMABET_AMOUNT_ALL
+		amount = GetConVar( "karmabet_allin_karma" ):GetInt()
 		all = true
 	else
 		karmabet_reportError( calling_ply, KARMABET_LANG.ulx_syntax )
@@ -45,7 +45,7 @@ function ulx.mybets( calling_ply, duration )
 
 	if not calling_ply then return false end
 	
-	if ulx.mybetsLastRun + KARMABET_MYBETS_COOLDOWN > os.time() then
+	if ulx.mybetsLastRun + GetConVar( "karmabet_mybets_cooldown" ):GetInt() > os.time() then
 		karmabet_reportError( calling_ply, KARMABET_LANG.ulx_cd_mybets )
 		return
 	end
@@ -62,7 +62,7 @@ mybets:help( "Shows your total bets." )
 
 function ulx.bestbets( calling_ply )
 
-	if ulx.bestbetsLastRun + KARMABET_BESTBETS_COOLDOWN > os.time() then
+	if ulx.bestbetsLastRun + GetConVar( "karmabet_bestbets_cooldown" ):GetInt() > os.time() then
 		karmabet_reportError( calling_ply, KARMABET_LANG.ulx_cd_bestbets )
 		return
 	end
@@ -77,7 +77,7 @@ bestbets:help( "Shows best betters of last 7 days." )
 
 function ulx.worstbets( calling_ply )
 
-	if ulx.worstbetsLastRun + KARMABET_WORSTBETS_COOLDOWN > os.time() then
+	if ulx.worstbetsLastRun + GetConVar( "karmabet_worstbets_cooldown" ):GetInt() > os.time() then
 		karmabet_reportError( calling_ply, KARMABET_LANG.ulx_cd_worstbets )
 		return
 	end

@@ -1,6 +1,5 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.3
 
 if SERVER then
 	
@@ -125,7 +124,7 @@ if SERVER then
 		end
 		
 		-- Check if player has enough karma to bet
-		if calling_ply:GetLiveKarma() < KARMABET_MINIMUM_LIVE_KARMA then
+		if calling_ply:GetLiveKarma() < GetConVar( "karmabet_min_live_karma" ):GetInt() then
 			karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_notenoughkarma )
 			return false
 		end
@@ -165,9 +164,9 @@ if SERVER then
 			local maxAdd = 0
 			
 			if all then
-				maxAdd = KARMABET_AMOUNT_ALL - saved_amount
+				maxAdd = GetConVar( "karmabet_allin_karma" ):GetInt() - saved_amount
 			else
-				maxAdd = KARMABET_MAXIMUM_KARMA - saved_amount
+				maxAdd = GetConVar( "karmabet_max_karma" ):GetInt() - saved_amount
 			end
 			
 			if amount > maxAdd then
@@ -176,7 +175,7 @@ if SERVER then
 			
 			-- Report hit maximum
 			if amount == 0 then
-				karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_maxbetwarn_1 .. KARMABET_MAXIMUM_KARMA .. KARMABET_LANG.cantbet_maxbetwarn_2 )
+				karmabet_reportError( calling_ply, KARMABET_LANG.cantbet_maxbetwarn_1 .. GetConVar( "karmabet_max_karma" ):GetInt() .. KARMABET_LANG.cantbet_maxbetwarn_2 )
 				return false
 			end
 			
@@ -206,8 +205,8 @@ if SERVER then
 	-- Adjusts bet to remaining karma above minimum
 	function karmabet_getAdjustedBetForLowKarma( ply, amount )
 	
-		if ply:GetLiveKarma() - amount < KARMABET_MINIMUM_LIVE_KARMA then
-			amount = math.floor( ply:GetLiveKarma() - KARMABET_MINIMUM_LIVE_KARMA )
+		if ply:GetLiveKarma() - amount < GetConVar( "karmabet_min_live_karma" ):GetInt() then
+			amount = math.floor( ply:GetLiveKarma() - GetConVar( "karmabet_min_live_karma" ):GetInt() )
 			if amount == 0 then
 				karmabet_reportError( ply, KARMABET_LANG.cantbet_notenoughremainingkarma )
 				return amount
@@ -219,10 +218,10 @@ if SERVER then
 	end
 	
 	function karmabet_enoughCorpsesFound()
-		if KARMABET_DEBUG then
-			print("[Karmabet] Corpses found: ".. karmabet_corpses_found .. ", KARMABET_MINIMUM_IDENTIFIED_BODIES: " .. KARMABET_MINIMUM_IDENTIFIED_BODIES)
+		if GetConVar( "karmabet_debug" ):GetBool() then
+			print("[Karmabet] Corpses found: ".. karmabet_corpses_found .. ", KARMABET_MINIMUM_IDENTIFIED_BODIES: " .. GetConVar( "karmabet_min_identified_bodies" ):GetInt())
 		end
-		return karmabet_corpses_found >= KARMABET_MINIMUM_IDENTIFIED_BODIES
+		return karmabet_corpses_found >= GetConVar( "karmabet_min_identified_bodies" ):GetInt()
 	end
 	
 	-- Actually start the bet
@@ -328,7 +327,7 @@ if SERVER then
 		
 		ServerLog("[Karmabet] Bets open!\n")
 		
-		timer.Create( "karmabet_timer_timewarning", KARMABET_BET_TIME - 20, 1, function()
+		timer.Create( "karmabet_timer_timewarning", GetConVar( "karmabet_bet_time" ):GetInt() - 20, 1, function()
 		
 			ULib.tsayColor( nil, false,
 				Color( 50, 50, 50, 255 ), "[", 
@@ -338,7 +337,7 @@ if SERVER then
 			
 		end )
 		
-		timer.Create( "karmabet_timer", KARMABET_BET_TIME, 1, function()
+		timer.Create( "karmabet_timer", GetConVar( "karmabet_bet_time" ):GetInt(), 1, function()
 		
 			ULib.tsayColor( nil, false,
 				Color( 50, 50, 50, 255 ), "[", 
