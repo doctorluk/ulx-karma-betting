@@ -27,14 +27,14 @@ ULib: https://steamcommunity.com/workshop/filedetails/?id=557962238
 If you intend to use the MySQL feature you'll need the [mysqloo](https://facepunch.com/showthread.php?t=1357773) Module to be installed. By default it will use SQLite which works just fine.
 
 ### INSTALLATION
-**Installing via Steam Workshop**
-1. Go to http://steamcommunity.com/sharedfiles/filedetails/?id=822165242 and add the addon to you server's workshop collection
+**Installing via Steam Workshop**  
+1. Go to http://steamcommunity.com/sharedfiles/filedetails/?id=822165242 and add the addon to you server's workshop collection  
 2. Done
 
-**Installing manually (no automatic updates!)**
-1. [Download](https://github.com/doctorluk/ulx-karma-betting/archive/master.zip) the package
-2. Extract it
-3. Upload the folder *betting* to your garrysmod/addons/ folder
+**Installing manually (no automatic updates!)**  
+1. [Download](https://github.com/doctorluk/ulx-karma-betting/archive/master.zip) the package  
+2. Extract it  
+3. Upload the folder *betting* to your garrysmod/addons/ folder  
 4. Done
 
 ### CONFIGURATION
@@ -60,5 +60,5 @@ karmabet_mysql_host "localhost"
 karmabet_mysql_dbname "database_name"  
 karmabet_mysql_username "database_user"  
 //karmabet_mysql_pw "DO_NOT_PUT_PASSWORD_HERE" // For the sake of safety, define this in your COMMAND LINE like this:  
-// ...+host_workshop_collection "blabla" [b]+karmabet_mysql_pw "put_password_here"[/b] +rcon_password "bluuh_blah" ...  
+// ...+host_workshop_collection "blabla" **+karmabet_mysql_pw "put_password_here"** +rcon_password "bluuh_blah" ...  
 karmabet_mysql_port 3306`
