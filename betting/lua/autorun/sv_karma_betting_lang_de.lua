@@ -62,7 +62,7 @@ local function loadLanguage()
 	KARMABET_LANG.ulx_cd_bestbets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."
 	KARMABET_LANG.ulx_cd_worstbets = "Dieser Befehl wurde gerade erst ausgeführt! Bitte warte einen Moment und versuche es erneut."
 
-	print( "[Karmabet] Loaded " .. table.Count(KARMABET_LANG) .. " language strings for language german") )
+	print( "[Karmabet] Loaded " .. table.Count(KARMABET_LANG) .. " language strings for language german" )
 end
 
 -- Since "english" is the default, we can just watch for a convar change (when reading the server.cfg) and update our language
