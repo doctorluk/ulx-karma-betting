@@ -1,6 +1,5 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
--- Version: 1.3
 
 ulx.bestbetsLastRun = 0
 ulx.worstbetsLastRun = 0
@@ -9,8 +8,33 @@ ulx.mybetsLastRun = 0
 local CATEGORY = "Karma Betting"
 
 function ulx.startkarmabet( calling_ply, target, amount )
+
+	local target = target
+	local amount = amount
 	
 	local all = false
+
+	-- Checking for DERMA Call
+	if target == "" and amount == "" then
+	
+		if not karmabet_getRoundCondition( calling_ply ) then return end
+		
+		net.Start( "karmabet_betgui" )
+		net.WriteInt( GetConVar( "karmabet_min_karma" ):GetInt(), 32 )
+		net.WriteInt( GetConVar( "karmabet_max_karma" ):GetInt(), 32 )
+		net.WriteInt( GetConVar( "karmabet_allin_karma" ):GetInt(), 32 )
+		net.WriteInt( KARMABET_LANG.id, 8 )
+		net.WriteString( karmabet_getRunningBetTeam( calling_ply ) )
+		net.Send( calling_ply )
+		return
+	end
+	
+	-- Make sure order of arguments does not matter
+	if ( isstring(amount) and isnumber(tonumber(target)) ) or ( isstring(target) and target == "all" ) then
+		local tmp_target = target
+		target = amount
+		amount = tmp_target
+	end
 	
 	-- Check amount syntax
 	-- NUMBER CHECK
@@ -35,8 +59,8 @@ function ulx.startkarmabet( calling_ply, target, amount )
 	
 end
 local startkarmabet = ulx.command( CATEGORY, "ulx startkarmabet", ulx.startkarmabet, "!bet" )
-startkarmabet:addParam{ type=ULib.cmds.StringArg, hint="'Traitor' or 'Innocent'" }
-startkarmabet:addParam{ type=ULib.cmds.StringArg, hint=KARMABET_LANG.ulx_syntax }
+startkarmabet:addParam{ type=ULib.cmds.StringArg, hint="'Traitor' or 'Innocent'", ULib.cmds.optional }
+startkarmabet:addParam{ type=ULib.cmds.StringArg, hint=KARMABET_LANG.ulx_syntax, ULib.cmds.optional }
 startkarmabet:defaultAccess( ULib.ACCESS_ALL )
 startkarmabet:help( "Starts a Karma bet." )
 

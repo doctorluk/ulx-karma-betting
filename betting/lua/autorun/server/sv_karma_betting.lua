@@ -22,6 +22,9 @@ if SERVER then
 	
 	-- Used to communicate with clients
 	util.AddNetworkString( "karmabet_updatehud" )
+	util.AddNetworkString( "karmabet_betgui" )
+	util.AddNetworkString( "karmabet_betgui_response" )
+	util.AddNetworkString( "karmabet_closegui" )
 	
 	-- Show given player a predesigned error message
 	function karmabet_reportError( ply, errormsg )
@@ -81,12 +84,7 @@ if SERVER then
 		
 	end
 	
-	-- Big check whether or not someone can bet
-	function karmabet_canBet( calling_ply, amount, target, all )
-	
-		local puthidden = false
-	
-		if not calling_ply then return false end
+	function karmabet_getRoundCondition( calling_ply )
 	
 		-- Only dead/spectating players are allowed to bet
 		if calling_ply:Alive() and not calling_ply:IsSpec() then
@@ -112,6 +110,18 @@ if SERVER then
 			return false
 		end
 		
+		return true
+		
+	end
+	
+	-- Big check whether or not someone can bet
+	function karmabet_canBet( calling_ply, amount, target, all )
+	
+		local puthidden = false
+	
+		if not calling_ply then return false end
+		if not karmabet_getRoundCondition( calling_ply ) then return false end
+
 		-- Check for valid team
 		target = string.lower( target )
 		if target == "t" or target == "traitor" then
@@ -200,6 +210,27 @@ if SERVER then
 		karmabet_start( calling_ply, amount, target, puthidden, all )
 		
 		return true
+	end
+	
+	function karmabet_getRunningBetTeam( calling_ply )
+	
+		local puthidden = false
+		
+		-- Make this bet only visible for spectators and dead players
+		if not puthidden and not karmabet_enoughCorpsesFound() then
+			puthidden = true
+		end
+		
+		local tmptable = {}
+		
+		-- Check if player changed his mind about voting or limit is reached
+		if puthidden then
+			tmptable = karmabet_tbl_betters_hidden[calling_ply:SteamID()]
+		else
+			tmptable = karmabet_tbl_betters[calling_ply:SteamID()]
+		end
+		
+		if not tmptable then return "" elseif tmptable[2] then return string.sub( tmptable[2], 1, 1 ) end
 	end
 	
 	-- Adjusts bet to remaining karma above minimum
@@ -315,6 +346,18 @@ if SERVER then
 		
 	end
 	
+	-- Receival of a player's bet via GUI
+	-- TODO: Make this more secure
+	net.Receive( "karmabet_betgui_response", function( net_response, ply )
+		karmabet_canBet( ply, net.ReadInt( 32 ), net.ReadString(), net.ReadBool() )
+	end)
+	
+	-- Force client's betting GUI to close when betting becomes impossible
+	function karmabet_forcecloseGUI()
+		net.Start( "karmabet_closegui" )
+		net.Broadcast()
+	end
+	
 	-- Running on the start of a round and timing the betting end
 	function karmabet_timedBettingEnd()
 	
@@ -345,6 +388,7 @@ if SERVER then
 				Color( 50, 50, 50, 255 ), "] ", 
 				Color( 255, 255, 0, 0 ), KARMABET_LANG.timer_betsclosed )
 			
+			karmabet_forcecloseGUI()
 			KARMABET_CAN_BET = false
 			ServerLog("[Karmabet] Bets closed!\n")
 			
@@ -430,6 +474,8 @@ if SERVER then
 					end
 				end
 			end
+			
+			karmabet_forcecloseGUI()
 			
 			-- PrintTable( karmabet_tbl_results )
 			karmabet_insertIntoDatabase()

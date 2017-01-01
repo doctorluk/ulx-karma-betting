@@ -32,7 +32,7 @@ local function loadLanguage()
 	KARMABET_LANG.cantbet_allin = "Du bist all-in gegangen. Jetzt kannst du nur noch warten!"
 	KARMABET_LANG.cantbet_wrongteam = "Du kannst nur dem gleichen Team mehr wetten und nicht mehr wechseln!"
 	KARMABET_LANG.cantbet_maxbetwarn_1 = "Du kannst nicht mehr als " -- + amount
-	KARMABET_LANG.cantbet_maxbetwarn_2 = " wetten!"
+	KARMABET_LANG.cantbet_maxbetwarn_2 = " wetten, außer du gehst mit 'all' all-in!"
 
 	KARMABET_LANG.timer_timeleft = "Noch 20 Sekunden um zu wetten!"
 	KARMABET_LANG.timer_betsclosed = "Wetten geschlossen!"
