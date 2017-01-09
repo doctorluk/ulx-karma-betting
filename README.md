@@ -8,6 +8,8 @@ Imagine you're playing with 10 players and most of them are dead, but you as the
 Usage of the MySQL capability of this plugin enables webhosts e.g. to implement the Bet-King into their MOTD to provide their players with additional imaginary fame.
 
 ### COMMAND LIST
+**!bet** - Opens up a small window in which you can select the team and the amount of karma you want to bet.
+
 **!bet \<team> \<amount>** - Places a bet on \<team> with \<amount>
 - _**team**_ → Either "innocent", "inno" or "i" for the INNOCENT team, or "traitor" or "t" for the TRAITOR team
 - _**amount**_ → An amount between karmabet_min_karma and karmabet_max_karma or "all" (amount = karmabet_allin_karma)
