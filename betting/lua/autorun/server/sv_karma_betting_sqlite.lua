@@ -31,15 +31,18 @@ if SERVER then
 		
 		-- Shows the player's sum of all bets he placed
 		function karmabet_showMyBetSummary( ply, steamid, duration )
-		
+			
+			-- Set the duration between 1-31 days or all-time
 			local duration = tonumber( duration ) or "all"
 			if isnumber( duration ) then
 				duration = math.Clamp( duration, 1, 31 ) -- Limit lookbacks between 1 and 31
 			end
 			
-			local querystring = "SELECT sum(amount) as total FROM `karmabet` WHERE steamid = '" .. db:escape(steamid) .. "' LIMIT 1"
+			local querystring = ""
 			
-			if ( duration ~= "all" and duration <= 31 and duration > 0 ) then
+			if ( duration == "all" ) then
+				querystring = "SELECT sum(amount) as total FROM `karmabet` WHERE steamid = '" .. db:escape(steamid) .. "' LIMIT 1"
+			else
 				querystring = "SELECT sum(amount) as total FROM `karmabet` WHERE date > (SELECT DATETIME('now', '-" .. duration .. " day')) AND steamid = '" .. db:escape(steamid) .. "' LIMIT 1"
 			end
 			
@@ -66,6 +69,7 @@ if SERVER then
 				
 					
 			for k, v in ipairs( list ) do
+				-- Result is empty
 				if #list == 0 or not tonumber(v.total) then
 					ULib.tsayColor( ply, true,
 						Color( 50, 50, 50, 255 ), "[", 
@@ -75,6 +79,7 @@ if SERVER then
 					return
 				end
 				
+				-- Positive karma first, then negative karma
 				if tonumber(v.total) >= 0 then
 					ULib.tsayColor( ply, true,
 						Color( 50, 50, 50, 255 ), "[", 
@@ -108,6 +113,7 @@ if SERVER then
 				end
 			end
 		
+			-- Empty list
 			if not list or #list == 0 then
 				ULib.tsayColor( nil, true,
 					Color( 50, 50, 50, 255 ), "[", 
@@ -117,6 +123,7 @@ if SERVER then
 				return
 			end
 			
+			-- First text saying "These are the x best betters:"
 			ULib.tsayColor( nil, true,
 					Color( 50, 50, 50, 255 ), "[", 
 					Color( 190, 40, 40, 255 ), "Karmabet",
@@ -125,7 +132,7 @@ if SERVER then
 					Color( 0, 255, 0, 255 ), KARMABET_LANG.bestbets_best,
 					Color( 255, 255, 255, 255 ), #list .. " ",
 					Color( 255, 255, 0, 255 ), KARMABET_LANG.bestbets_betters )
-					
+			-- followed by a list of the players found in the db
 			for k, v in ipairs( list ) do
 				ULib.tsayColor( nil, true,
 					Color( 50, 50, 50, 255 ), "[", 
@@ -151,7 +158,8 @@ if SERVER then
 					print( "Empty list!" )
 				end
 			end
-		
+			
+			-- List is empty
 			if not list or #list == 0 then
 				ULib.tsayColor( nil, true,
 					Color( 50, 50, 50, 255 ), "[", 
@@ -161,6 +169,7 @@ if SERVER then
 				return
 			end
 			
+			-- First text saying "These are the x worst betters:"
 			ULib.tsayColor( nil, true,
 					Color( 50, 50, 50, 255 ), "[", 
 					Color( 190, 40, 40, 255 ), "Karmabet",
@@ -169,7 +178,7 @@ if SERVER then
 					Color( 255, 0, 0, 255 ), KARMABET_LANG.worstbets_worst,
 					Color( 255, 255, 255, 255 ), #list .. " ",
 					Color( 255, 255, 0, 255 ), KARMABET_LANG.worstbets_betters )
-					
+			-- followed by a list of the players found in the db
 			for k, v in ipairs( list ) do
 				ULib.tsayColor( nil, true,
 					Color( 50, 50, 50, 255 ), "[", 
@@ -240,7 +249,7 @@ if SERVER then
 			
 		end 
 	end
-	hook.Add( "Think", "karmabet_sqlite_think", loadSQLite )
-	hook.Add( "karmabet_loadsqlite", "karmabet_sqlite_call", function() loadSQLite( true ) end )
+	hook.Add( "Think", "karmabet_sqlite_think", loadSQLite ) -- Uses SQLite if it is configured to be used
+	hook.Add( "karmabet_loadsqlite", "karmabet_sqlite_call", function() loadSQLite( true ) end ) -- Uses SQLite if something is set up wrongly
 	
 end
