@@ -39,6 +39,7 @@ local function loadLanguage()
 
 	KARMABET_LANG.roundend_wins = " wins "
 	KARMABET_LANG.roundend_loses = " loses "
+	KARMABET_LANG.roundend_none = "No counter bets placed. What a waste..."
 
 	KARMABET_LANG.db_noentries = "Sorry, no entries found!"
 

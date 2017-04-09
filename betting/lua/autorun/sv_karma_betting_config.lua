@@ -17,6 +17,11 @@ CreateConVar( "karmabet_mysql_port", "none", {FCVAR_DONTRECORD, FCVAR_PROTECTED}
 -- The language of the plugin
 CreateConVar( "karmabet_language", "english", {FCVAR_DONTRECORD}, "" )
 
+-- How people are rewarded
+-- 1: Winners always win karma and a part of the karma losers placed (if existing)
+-- 2: Winners get the amount of karma that losers placed
+CreateConVar( "karmabet_reward_type", "1", {FCVAR_DONTRECORD}, "" )
+
 -- Configure the minimum amount of identified corpses to show the total amount of placed bets publicly
 CreateConVar( "karmabet_min_identified_bodies", "2", {FCVAR_DONTRECORD}, "" )
 

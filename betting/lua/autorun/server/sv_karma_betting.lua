@@ -31,7 +31,8 @@ if SERVER then
 		ULib.tsayColor( ply, true,
 			Color( 50, 50, 50, 255 ), "[", 
 			Color( 190, 40, 40, 255 ), "Karmabet",
-			Color( 50, 50, 50, 255 ), "] ", Color( 255, 0, 0, 255 ), "ERROR: ",
+			Color( 50, 50, 50, 255 ), "] ",
+			Color( 255, 0, 0, 255 ), "ERROR: ",
 			Color( 255, 255, 0, 0 ), errormsg )
 	end
 	
@@ -407,15 +408,14 @@ if SERVER then
 			timer.Remove( "karmabet_timer" )
 			
 			local loser_amount = karmabet_bet_total_t
+			local winner_amount = karmabet_bet_total_i
 			karmabet_winner = "innocent"
 			
 			if winning_team == WIN_TRAITOR then
 				karmabet_winner = "traitor"
 				loser_amount = karmabet_bet_total_i
+				winner_amount = karmabet_bet_total_t
 			end
-			
-			local own_bet_winscale = (math.random(10, 25) / 100) -- between 10% and 25% of entered bet
-			local losers_bet_winscale = (math.random(5, 15) / 100) -- between 5% and 15% of bets from the losing team
 			
 			-- First we put our hidden entries into the normal database	if that hasn't happened before
 			for id, entry in pairs( karmabet_tbl_betters_hidden ) do
@@ -429,48 +429,141 @@ if SERVER then
 			
 			table.Empty( karmabet_tbl_betters_hidden )
 			
-			-- Winners get their bet, and a bonus depending on the amount of bets against them				
-			for id, entry in pairs( karmabet_tbl_betters ) do
-			
-				local ply = player.GetBySteamID( id )
-				if ply then
+			-- Old betting behaviour
+			-- Players that have bet get a reward no matter if counter bets have been placed (random amount)
+			-- plus counter bets if there were any
+			if GetConVar( "karmabet_reward_type" ):GetString() == "1" then
 				
-					local amount = entry[1]
-					local target = entry[2]
-					local allin = entry[3]
+				local own_bet_winscale = (math.random(10, 25) / 100) -- between 10% and 25% of entered bet
+				local losers_bet_winscale = (math.random(5, 15) / 100) -- between 5% and 15% of bets from the losing team
+			
+				-- Winners get their bet, and a bonus depending on the amount of bets against them				
+				for id, entry in pairs( karmabet_tbl_betters ) do
+				
+					local ply = player.GetBySteamID( id )
+					if ply then
 					
-					if target == karmabet_winner then
+						local amount = entry[1]
+						local target = entry[2]
+						local allin = entry[3]
+						
+						if target == karmabet_winner then
+						
+							local gained = math.ceil( amount * own_bet_winscale + loser_amount * losers_bet_winscale )
+							local karmaReturned = math.ceil( amount + gained )
+							
+							karmabet_tbl_results[id] = { karmaReturned, target }
+							
+							ULib.tsayColor( nil, false,
+								Color( 50, 50, 50, 255 ), "[", 
+								Color( 190, 40, 40, 255 ), "Karmabet",
+								Color( 50, 50, 50, 255 ), "] ",
+								Color( 255, 255, 0, 0 ), ply:Nick(),
+								Color( 0, 255, 0, 255 ), KARMABET_LANG.roundend_wins,
+								Color( 255, 255, 255, 255 ), karmaReturned .. " [+" .. gained .. "]",
+								Color( 0, 255, 0, 255 ), " " .. KARMABET_LANG.general_karma .. "!" )
+							
+							local newKarma = ply:GetLiveKarma() + karmaReturned
+							if newKarma > GetConVar("ttt_karma_max"):GetInt() then newKarma = GetConVar("ttt_karma_max"):GetInt() end
+							ply:SetBaseKarma( newKarma )
+							ply:SetLiveKarma( newKarma )
+							
+						else
+						
+							ULib.tsayColor( nil, false,
+								Color( 50, 50, 50, 255 ), "[", 
+								Color( 190, 40, 40, 255 ), "Karmabet",
+								Color( 50, 50, 50, 255 ), "] ",
+								Color( 255, 255, 0, 0 ), ply:Nick(),
+								Color( 255, 0, 0, 255 ), KARMABET_LANG.roundend_loses,
+								Color( 255, 255, 255, 255 ), "-" .. amount .. "",
+								Color( 255, 0, 0, 255 ), " " .. KARMABET_LANG.general_karma .. "!" )
+							
+							karmabet_tbl_results[id] = { amount, target }
+						end
+					end
+				end
+				
+			-- New betting behaviour
+			-- Players only get bonus karma if counter bets have been placed
+			-- The amount they gain from counter bets depends on their proportion of total bets placed
+			else
+				
+				-- There were no counter bets placed, so winners get their karma back
+				if(table.Count(karmabet_tbl_betters) > 0 and (loser_amount == 0 or winner_amount == 0)) then
+				
+					ULib.tsayColor( nil, false,
+										Color( 50, 50, 50, 255 ), "[", 
+										Color( 190, 40, 40, 255 ), "Karmabet",
+										Color( 50, 50, 50, 255 ), "] ",
+										Color( 255, 255, 0, 0 ), KARMABET_LANG.roundend_none )
+				
+					for id, entry in pairs( karmabet_tbl_betters ) do
+						local ply = player.GetBySteamID( id )
+						if ply then
+						
+							local amount = entry[1]
+							local target = entry[2]
+							local allin = entry[3]
+						
+							local karmaReturned = amount 
+							
+							local newKarma = ply:GetLiveKarma() + karmaReturned
+							if newKarma > GetConVar("ttt_karma_max"):GetInt() then newKarma = GetConVar("ttt_karma_max"):GetInt() end
+							ply:SetBaseKarma( newKarma )
+							ply:SetLiveKarma( newKarma )
+						end
+					end
+				
+				-- There were counter bets existing
+				else
 					
-						local karmaReturned = math.ceil( amount + ( amount * own_bet_winscale ) + ( loser_amount * losers_bet_winscale ) )
-						
-						karmabet_tbl_results[id] = { karmaReturned, target }
-						
-						ULib.tsayColor( nil, false,
-							Color( 50, 50, 50, 255 ), "[", 
-							Color( 190, 40, 40, 255 ), "Karmabet",
-							Color( 50, 50, 50, 255 ), "] ",
-							Color( 255, 255, 0, 0 ), ply:Nick(),
-							Color( 0, 255, 0, 255 ), KARMABET_LANG.roundend_wins,
-							Color( 255, 255, 255, 255 ), karmaReturned .. "",
-							Color( 0, 255, 0, 255 ), " " .. KARMABET_LANG.general_karma .. "!" )
-						
-						local newKarma = ply:GetLiveKarma() + karmaReturned
-						if newKarma > GetConVar("ttt_karma_max"):GetInt() then newKarma = GetConVar("ttt_karma_max"):GetInt() end
-						ply:SetBaseKarma( newKarma )
-						ply:SetLiveKarma( newKarma )
-						
-					else
+					-- Winners get their bet, and a bonus depending on the amount of bets against them				
+					for id, entry in pairs( karmabet_tbl_betters ) do
 					
-						ULib.tsayColor( nil, false,
-							Color( 50, 50, 50, 255 ), "[", 
-							Color( 190, 40, 40, 255 ), "Karmabet",
-							Color( 50, 50, 50, 255 ), "] ",
-							Color( 255, 255, 0, 0 ), ply:Nick(),
-							Color( 255, 0, 0, 255 ), KARMABET_LANG.roundend_loses,
-							Color( 255, 255, 255, 255 ), amount .. "",
-							Color( 255, 0, 0, 255 ), " " .. KARMABET_LANG.general_karma .. "!" )
+						local ply = player.GetBySteamID( id )
+						if ply then
 						
-						karmabet_tbl_results[id] = { amount, target }
+							local amount = entry[1]
+							local target = entry[2]
+							local allin = entry[3]
+							
+							if target == karmabet_winner then
+								
+								local proportion = amount / winner_amount
+								local gained = math.ceil(proportion * loser_amount)
+								local karmaReturned = math.ceil( amount + gained )
+								
+								karmabet_tbl_results[id] = { karmaReturned, target }
+								
+								ULib.tsayColor( nil, false,
+									Color( 50, 50, 50, 255 ), "[", 
+									Color( 190, 40, 40, 255 ), "Karmabet",
+									Color( 50, 50, 50, 255 ), "] ",
+									Color( 255, 255, 0, 0 ), ply:Nick(),
+									Color( 0, 255, 0, 255 ), KARMABET_LANG.roundend_wins,
+									Color( 255, 255, 255, 255 ), karmaReturned .. " [+" .. gained .. "]",
+									Color( 0, 255, 0, 255 ), " " .. KARMABET_LANG.general_karma .. "!" )
+								
+								local newKarma = ply:GetLiveKarma() + karmaReturned
+								if newKarma > GetConVar("ttt_karma_max"):GetInt() then newKarma = GetConVar("ttt_karma_max"):GetInt() end
+								ply:SetBaseKarma( newKarma )
+								ply:SetLiveKarma( newKarma )
+								
+							else
+							
+								ULib.tsayColor( nil, false,
+									Color( 50, 50, 50, 255 ), "[", 
+									Color( 190, 40, 40, 255 ), "Karmabet",
+									Color( 50, 50, 50, 255 ), "] ",
+									Color( 255, 255, 0, 0 ), ply:Nick(),
+									Color( 255, 0, 0, 255 ), KARMABET_LANG.roundend_loses,
+									Color( 255, 255, 255, 255 ), "-" .. amount .. "",
+									Color( 255, 0, 0, 255 ), " " .. KARMABET_LANG.general_karma .. "!" )
+								
+								karmabet_tbl_results[id] = { amount, target }
+							end
+						end
 					end
 				end
 			end
