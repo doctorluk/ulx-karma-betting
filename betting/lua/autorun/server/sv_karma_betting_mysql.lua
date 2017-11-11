@@ -1,7 +1,7 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
 
-if SERVER then
+if SERVER and GetConVar( "karmabet_savemode" ):GetString() == "mysql" then
 
 	require( "mysqloo" )
 	local db
