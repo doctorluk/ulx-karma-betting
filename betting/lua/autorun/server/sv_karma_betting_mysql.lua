@@ -163,7 +163,7 @@ if SERVER then
 		
 		-- Shows the five highest entries in the database
 		function karmabet_showBestBetters( duration )
-			query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY steamid HAVING sum(amount) > 0 ORDER BY total DESC LIMIT 5", function( list )
+			query( "SELECT ANY_VALUE(name) as name, sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY steamid HAVING sum(amount) > 0 ORDER BY total DESC LIMIT 5", function( list )
 				
 				if GetConVar( "karmabet_debug" ):GetBool() then
 					print( "[Karmabet] showBestBetters table results:" ) 
@@ -206,7 +206,7 @@ if SERVER then
 		
 		-- Shows the five lowest entries in the database
 		function karmabet_showWorstBetters( duration )
-			query( "SELECT name, sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY steamid HAVING sum(amount) < 0 ORDER BY total ASC LIMIT 5", function( list )
+			query( "SELECT ANY_VALUE(name) as name, sum(amount) as total FROM `karmabet` WHERE date >= DATE_SUB(NOW(), INTERVAL 7 DAY) GROUP BY steamid HAVING sum(amount) < 0 ORDER BY total ASC LIMIT 5", function( list )
 				
 				if GetConVar( "karmabet_debug" ):GetBool() then
 					print( "[Karmabet] showWorstBetters table results:" ) 
