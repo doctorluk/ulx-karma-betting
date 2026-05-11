@@ -56,6 +56,15 @@ if SERVER then
 
 		function db:onConnected()
 			print( "[Karmabet] Connected to MySQL." )
+			db:query([[CREATE TABLE IF NOT EXISTS `karmabet` (
+			`id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			`bet_id` INT UNSIGNED NOT NULL,
+			`name` VARCHAR(255) NOT NULL,
+			`steamid` VARCHAR(255) NOT NULL,
+			`amount` INT NOT NULL,
+			`date` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			PRIMARY KEY (`id`)
+			);]]):start()
 		end
 
 		-- Finally connect to the database
