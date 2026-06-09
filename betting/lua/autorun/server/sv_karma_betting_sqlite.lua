@@ -1,7 +1,7 @@
 -- Made by Luk
 -- http://steamcommunity.com/id/doctorluk/
 
-if SERVER then
+if SERVER and GetConVar( "karmabet_savemode" ):GetString() == "sqlite" then
 
 	local function loadSQLite( force )
 		-- This function runs when the server is fully loaded
